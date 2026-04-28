@@ -1,0 +1,190 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@300;400;500;600;700&family=VT323&family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-bg-app: var(--bg-app);
+  --color-card: var(--card);
+  --color-text-main: var(--text-main);
+  --color-text-muted: var(--text-muted);
+  --color-accent-soft: var(--accent-soft);
+  --color-research-line: var(--research-line);
+  
+  --font-sans: var(--font-main), "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-heading), "Space Grotesk", sans-serif;
+  --font-mono: var(--font-code), "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  @keyframes pulse-slow {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+
+  @keyframes orbit {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes scanline {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+  }
+
+  @keyframes flicker {
+    0% { opacity: 0.8; }
+    5% { opacity: 0.6; }
+    10% { opacity: 0.9; }
+    15% { opacity: 0.4; }
+    20% { opacity: 1; }
+    100% { opacity: 1; }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0) translateX(0); }
+    25% { transform: translateY(-10px) translateX(5px); }
+    50% { transform: translateY(0) translateX(10px); }
+    75% { transform: translateY(10px) translateX(5px); }
+  }
+}
+
+:root {
+  --primary: #0088FF;
+  --secondary: #6366f1;
+  --bg-app: #0A0B0F;
+  --card: #12141C;
+  --text-main: #F8FAFC;
+  --text-muted: #64748B;
+  --accent-soft: #1E293B;
+  --research-line: #1E293B;
+  --font-main: "Inter";
+  --font-heading: "Space Grotesk";
+  --font-code: "JetBrains Mono";
+}
+
+[data-theme='light'] {
+  --primary: #0055FF;
+  --secondary: #4F46E5;
+  --bg-app: #F8FAFC;
+  --card: #FFFFFF;
+  --text-main: #020617;
+  --text-muted: #334155;
+  --accent-soft: #EEF2FF;
+  --research-line: #CBD5E1;
+  --font-main: "Inter";
+  --font-heading: "Space Grotesk";
+}
+
+[data-theme='cyberpunk'] {
+  --primary: #FF00FF;
+  --secondary: #00FFFF;
+  --bg-app: #0D0221;
+  --card: #190E4F;
+  --text-main: #00FFFF;
+  --text-muted: #FF00FF;
+  --accent-soft: #240046;
+  --research-line: #FF00FF;
+  --font-main: "Share Tech Mono";
+  --font-heading: "Orbitron";
+  --font-code: "Share Tech Mono";
+}
+
+[data-theme='matrix'] {
+  --primary: #00FF41;
+  --secondary: #008F11;
+  --bg-app: #0D0208;
+  --card: #000000;
+  --text-main: #00FF41;
+  --text-muted: #008F11;
+  --accent-soft: #003B00;
+  --research-line: #00FF41;
+  --font-main: "Share Tech Mono";
+  --font-heading: "Share Tech Mono";
+  --font-code: "Share Tech Mono";
+}
+
+[data-theme='spectrum'] {
+  --primary: #FFFF00;
+  --secondary: #00FFFF;
+  --bg-app: #000000;
+  --card: #000000;
+  --text-main: #FFFFFF;
+  --text-muted: #00FF00;
+  --accent-soft: #0000FF;
+  --research-line: #FFFFFF;
+  --font-main: "VT323";
+  --font-heading: "VT323";
+  --font-code: "VT323";
+}
+
+[data-theme='space'] {
+  --primary: #8DE4FF;
+  --secondary: #E0C3FC;
+  --bg-app: #050510;
+  --card: #0C0C1E;
+  --text-main: #E0E1DD;
+  --text-muted: #778DA9;
+  --accent-soft: #1B263B;
+  --research-line: #415A77;
+  --font-main: "Inter";
+  --font-heading: "Orbitron";
+}
+
+@layer base {
+  body {
+    @apply bg-bg-app text-text-main font-sans selection:bg-primary/20 selection:text-primary overflow-x-hidden transition-colors duration-500;
+    background-image: 
+      radial-gradient(circle at 50% 50%, rgba(0, 209, 255, 0.05) 0%, transparent 100%),
+      linear-gradient(rgba(0, 209, 255, 0.01) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 209, 255, 0.01) 1px, transparent 1px);
+    background-size: 100% 100%, 40px 40px, 40px 40px;
+    background-attachment: fixed;
+  }
+}
+
+@layer utilities {
+  .clip-path-in {
+    clip-path: polygon(0 0, 100% 0, 95% 100%, 0% 100%);
+  }
+  .tech-border {
+    position: relative;
+  }
+  .tech-border::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 2px;
+    height: 10px;
+    background: var(--color-primary);
+  }
+  .tech-border::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 2px;
+    height: 10px;
+    background: var(--color-primary);
+  }
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-research-line rounded-full hover:bg-primary/40 transition-colors;
+}
+
+.animate-spin-slow {
+  animation: spin 8s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

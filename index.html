@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>STEM_DATA_LAB</title>
+    <script>
+      // Defensive fix for "Cannot set property fetch of #<Window> which has only a getter"
+      (function() {
+        try {
+          const original = window.fetch;
+          if (typeof original === 'function') {
+            Object.defineProperty(window, 'fetch', {
+              get: function() { return original; },
+              set: function() { console.warn('Blocked attempt to reassign window.fetch'); },
+              configurable: true
+            });
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

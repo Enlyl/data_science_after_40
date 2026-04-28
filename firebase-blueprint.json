@@ -1,0 +1,42 @@
+{
+  "entities": {
+    "User": {
+      "title": "Пользователь",
+      "description": "Профиль пользователя и его метаданные",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "xp": { "type": "integer" },
+        "level": { "type": "integer" },
+        "streak": { "type": "integer" },
+        "lastActive": { "type": "string", "format": "date-time" },
+        "unlockedSkills": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["uid", "xp", "level"]
+    },
+    "LessonProgress": {
+      "title": "Прогресс урока",
+      "description": "Записи о завершенных кейсах",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "lessonId": { "type": "string" },
+        "completedAt": { "type": "string", "format": "date-time" },
+        "xpEarned": { "type": "integer" }
+      },
+      "required": ["userId", "lessonId"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Корневой документ пользователя"
+    },
+    "/users/{userId}/progress/{lessonId}": {
+      "schema": "LessonProgress",
+      "description": "История прохождения уроков"
+    }
+  }
+}
