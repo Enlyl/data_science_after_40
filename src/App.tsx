@@ -114,6 +114,16 @@ function AppContent() {
   });
   const [isThemeTransitioning, setIsThemeTransitioning] = useState(false);
 
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
+    return localStorage.getItem('sidebar_collapsed') === 'true';
+  });
+
+  const toggleSidebar = () => {
+    const newState = !isSidebarCollapsed;
+    setIsSidebarCollapsed(newState);
+    localStorage.setItem('sidebar_collapsed', newState.toString());
+  };
+
   const setTheme = (newTheme: 'research' | 'light' | 'cyberpunk' | 'matrix' | 'spectrum' | 'space') => {
     setIsThemeTransitioning(true);
     setTimeout(() => {
@@ -476,27 +486,30 @@ function AppContent() {
 
       {/* Sidebar Navigation */}
       <nav className={cn(
-        "fixed bottom-0 left-0 right-0 z-50 md:sticky md:top-0 md:h-screen md:w-[280px] md:flex-col border-t md:border-t-0 md:border-r border-research-line py-2 md:py-10 px-4 md:px-6 flex justify-between items-center md:items-stretch overflow-y-auto no-scrollbar transition-all duration-500 shadow-2xl md:shadow-none",
+        "fixed bottom-0 left-0 right-0 z-50 md:sticky md:top-0 md:h-screen md:flex-col border-t md:border-t-0 md:border-r border-research-line py-2 px-4 flex justify-between items-center md:items-stretch overflow-y-auto no-scrollbar transition-all duration-500 shadow-2xl md:shadow-none",
+        isSidebarCollapsed ? "md:w-[88px] md:py-8 md:px-3" : "md:w-[280px] md:py-10 md:px-6",
         theme === 'light' ? "bg-white/95" : "bg-card/80 backdrop-blur-3xl"
       )}>
         <div 
           onClick={() => setActiveTab('help')}
-          className="hidden md:flex flex-col gap-1 mb-12 px-2 cursor-pointer group"
+          className={cn("hidden md:flex flex-col gap-1 mb-12 px-2 cursor-pointer group", isSidebarCollapsed && "items-center px-0")}
         >
           <div className="flex items-center gap-4">
-             <div className="w-12 h-12 bg-primary/10 border border-primary/20 rounded-2xl flex items-center justify-center text-primary group-hover:scale-110 transition-all duration-500 shadow-lg shadow-primary/5 group-hover:shadow-primary/20">
+             <div className="w-12 h-12 shrink-0 bg-primary/10 border border-primary/20 rounded-2xl flex items-center justify-center text-primary group-hover:scale-110 transition-all duration-500 shadow-lg shadow-primary/5 group-hover:shadow-primary/20">
                <Atom className="w-7 h-7 animate-spin-slow" />
              </div>
-             <div className="flex flex-col">
-                <span className="font-black text-2xl tracking-tighter text-text-main leading-none italic uppercase">STEM_DATA</span>
-                <span className="font-bold text-[10px] text-primary tracking-[0.3em] mt-1.5 opacity-80 uppercase">VIRTUAL_CORE</span>
-             </div>
+             {!isSidebarCollapsed && (
+               <div className="flex flex-col">
+                  <span className="font-black text-2xl tracking-tighter text-text-main leading-none italic uppercase">STEM_DATA</span>
+                  <span className="font-bold text-[10px] text-primary tracking-[0.3em] mt-1.5 opacity-80 uppercase">VIRTUAL_CORE</span>
+               </div>
+             )}
           </div>
         </div>
         
         <div className="flex gap-2 md:flex-col md:gap-1 mx-0 w-full justify-start overflow-x-auto md:overflow-x-visible no-scrollbar pb-2 md:pb-0">
           <div className="hidden md:block mb-4">
-            <p className="text-[10px] font-black text-primary/40 uppercase tracking-[0.3em] px-2 mb-2 italic">Essential_Tools</p>
+            {!isSidebarCollapsed && <p className="text-[10px] font-black text-primary/40 uppercase tracking-[0.3em] px-2 mb-2 italic">Essential_Tools</p>}
             <div className="space-y-1">
               <NavButton 
                 active={activeTab === 'help'} 
@@ -506,6 +519,7 @@ function AppContent() {
                 theme={theme}
                 playSound={playSound}
                 highlight={true}
+                isCollapsed={isSidebarCollapsed}
               />
               <NavButton 
                 active={activeTab === 'news'} 
@@ -514,6 +528,7 @@ function AppContent() {
                 label={t('nav.news')} 
                 theme={theme}
                 playSound={playSound}
+                isCollapsed={isSidebarCollapsed}
               />
             </div>
           </div>
@@ -521,7 +536,7 @@ function AppContent() {
           <div className="hidden md:block w-full h-px bg-research-line my-4 opacity-30" />
 
           <div className="hidden md:block mb-4">
-            <p className="text-[10px] font-black text-secondary/40 uppercase tracking-[0.3em] px-2 mb-2 italic">Data_Science_Lab</p>
+            {!isSidebarCollapsed && <p className="text-[10px] font-black text-secondary/40 uppercase tracking-[0.3em] px-2 mb-2 italic">Data_Science_Lab</p>}
             <div className="space-y-1">
               <NavButton 
                 active={activeTab === 'lecture_hall'} 
@@ -530,6 +545,7 @@ function AppContent() {
                 label={language === 'en' ? 'Missions' : 'Миссии'} 
                 theme={theme}
                 playSound={playSound}
+                isCollapsed={isSidebarCollapsed}
               />
               <NavButton 
                 active={activeTab === 'theory_hub'} 
@@ -538,6 +554,7 @@ function AppContent() {
                 label={language === 'en' ? 'Theory' : 'Теория'} 
                 theme={theme}
                 playSound={playSound}
+                isCollapsed={isSidebarCollapsed}
               />
               <NavButton 
                 active={activeTab === 'data_lab'} 
@@ -546,6 +563,7 @@ function AppContent() {
                 label={language === 'en' ? 'Data Lab' : 'Дата-Лаб'} 
                 theme={theme}
                 playSound={playSound}
+                isCollapsed={isSidebarCollapsed}
               />
               <NavButton 
                 active={activeTab === 'sandbox'} 
@@ -554,6 +572,7 @@ function AppContent() {
                 label={language === 'en' ? 'Sandbox' : 'Песочница'} 
                 theme={theme}
                 playSound={playSound}
+                isCollapsed={isSidebarCollapsed}
               />
             </div>
           </div>
@@ -561,7 +580,7 @@ function AppContent() {
           <div className="hidden md:block w-full h-px bg-research-line my-4 opacity-30" />
 
           <div className="hidden md:block mb-4">
-            <p className="text-[10px] font-black text-text-muted/40 uppercase tracking-[0.3em] px-2 mb-2 italic">Growth_Hub</p>
+            {!isSidebarCollapsed && <p className="text-[10px] font-black text-text-muted/40 uppercase tracking-[0.3em] px-2 mb-2 italic">Growth_Hub</p>}
             <div className="space-y-1">
               <NavButton 
                 active={activeTab === 'skills'} 
@@ -570,6 +589,7 @@ function AppContent() {
                 label={t('nav.skills')} 
                 theme={theme}
                 playSound={playSound}
+                isCollapsed={isSidebarCollapsed}
               />
               <NavButton 
                 active={activeTab === 'progress'} 
@@ -578,6 +598,7 @@ function AppContent() {
                 label={language === 'en' ? 'Rank' : 'Рейтинг'} 
                 theme={theme}
                 playSound={playSound}
+                isCollapsed={isSidebarCollapsed}
               />
               <NavButton 
                 active={activeTab === 'tutor'} 
@@ -586,6 +607,7 @@ function AppContent() {
                 label={t('nav.tutor')} 
                 theme={theme}
                 playSound={playSound}
+                isCollapsed={isSidebarCollapsed}
               />
             </div>
           </div>
@@ -600,6 +622,7 @@ function AppContent() {
               label={t('nav.cabinet')} 
               theme={theme}
               playSound={playSound}
+              isCollapsed={isSidebarCollapsed}
             />
             <NavButton 
               active={activeTab === 'settings'} 
@@ -608,11 +631,14 @@ function AppContent() {
               label={t('nav.settings')} 
               theme={theme}
               playSound={playSound}
+              isCollapsed={isSidebarCollapsed}
             />
           </div>
         </div>
 
         <div className="hidden md:block mt-auto space-y-4">
+          {!isSidebarCollapsed && (
+            <>
            <div className="bg-primary/5 border border-primary/10 p-5 rounded-2xl relative overflow-hidden group">
                <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                <div className="flex justify-between items-center mb-3">
@@ -651,14 +677,45 @@ function AppContent() {
                  <span className="text-primary text-[10px] animate-pulse">SECURED</span>
               </div>
            </div>
+           </>
+          )}
+          
+          {/* Collapsed rank summary */}
+          {isSidebarCollapsed && (
+            <div className="flex flex-col items-center gap-4 py-4 border-t border-research-line">
+               <div className="flex flex-col items-center justify-center relative w-10 h-10 group cursor-help">
+                 <svg className="w-10 h-10 -rotate-90">
+                    <circle cx="20" cy="20" r="18" fill="transparent" stroke="var(--color-research-line)" strokeWidth="2" />
+                    <circle cx="20" cy="20" r="18" fill="transparent" stroke="var(--color-primary)" strokeWidth="2" strokeDasharray="113" strokeDashoffset={113 - (113 * ((xp % 500) / 500))} className="transition-all duration-700 ease-out drop-shadow-[0_0_5px_var(--color-primary)]" />
+                 </svg>
+                 <span className="absolute text-[8px] font-black text-primary">{level}</span>
+                 <div className="absolute left-14 hidden group-hover:flex bg-card border border-research-line px-3 py-2 rounded-lg text-xs whitespace-nowrap z-50">
+                    {xp % 500} / 500 XP
+                 </div>
+               </div>
+            </div>
+          )}
         </div>
 
         <div className="mt-4 px-2">
             <button 
               onClick={logout}
-              className="w-full flex items-center justify-start px-6 gap-3 py-3 text-[9px] font-mono text-text-muted hover:text-secondary uppercase tracking-[0.2em] transition-all border border-research-line rounded-xl hover:bg-secondary/5 group"
+              className={cn("w-full flex items-center px-6 gap-3 py-3 text-[9px] font-mono text-text-muted hover:text-secondary uppercase tracking-[0.2em] transition-all border border-research-line rounded-xl hover:bg-secondary/5 group",
+               isSidebarCollapsed ? "justify-center px-0" : "justify-start")}
+              title={isSidebarCollapsed ? t('common.close') : undefined}
             >
-              <Settings className="w-3.5 h-3.5 group-hover:rotate-90 transition-transform" /> {t('common.close')}
+              <Settings className="w-3.5 h-3.5 group-hover:rotate-90 transition-transform shrink-0" />
+              {!isSidebarCollapsed && <span>{t('common.close')}</span>}
+            </button>
+            
+            <button
+               onClick={toggleSidebar}
+               className={cn("hidden md:flex w-full mt-2 items-center px-6 gap-3 py-3 text-[9px] font-mono text-text-muted hover:text-primary uppercase tracking-[0.2em] transition-all border border-research-line rounded-xl hover:bg-primary/5 group",
+               isSidebarCollapsed ? "justify-center px-0" : "justify-start")}
+               title={isSidebarCollapsed ? (language === 'en' ? "Expand Sidebar" : "Развернуть") : (language === 'en' ? "Collapse Sidebar" : "Свернуть")}
+            >
+               <ChevronRight className={cn("w-3.5 h-3.5 transition-transform duration-300 shrink-0", !isSidebarCollapsed ? "rotate-180" : "rotate-0")} />
+               {!isSidebarCollapsed && <span>{language === 'en' ? 'Collapse' : 'Свернуть'}</span>}
             </button>
         </div>
       </nav>
@@ -1765,7 +1822,7 @@ function AppContent() {
   );
 }
 
-function NavButton({ active, onClick, icon, label, theme, playSound, highlight = false }: { active: boolean, onClick: () => void, icon: React.ReactNode, label: string, theme: string, playSound: (t: any) => void, highlight?: boolean }) {
+function NavButton({ active, onClick, icon, label, theme, playSound, highlight = false, isCollapsed = false }: { active: boolean, onClick: () => void, icon: React.ReactNode, label: string, theme: string, playSound: (t: any) => void, highlight?: boolean, isCollapsed?: boolean }) {
   const getThemeIcon = (originalIcon: any) => {
     const iconSize = "w-5 h-5 md:w-6 md:h-6";
     if (theme === 'space') return <Stars className={iconSize} />;
@@ -1783,9 +1840,12 @@ function NavButton({ active, onClick, icon, label, theme, playSound, highlight =
   return (
     <button 
       onClick={handleClick}
+      title={isCollapsed ? label : undefined}
       className={cn(
         "flex md:flex-row flex-col items-start md:items-center gap-3 md:gap-4 px-4 md:px-5 py-3 md:py-4 rounded-2xl transition-all duration-500 w-fit md:w-full relative group overflow-hidden shrink-0",
+        isCollapsed && "md:px-0 md:justify-center",
         active ? (theme === 'light' ? "bg-primary/10 text-primary border border-primary/40 shadow-lg" : "bg-primary/10 text-primary border border-primary/20 shadow-[0_0_30px_rgba(0,209,255,0.05)]") : 
+
         highlight ? (theme === 'light' ? "bg-secondary text-white border border-secondary shadow-md hover:bg-secondary/90" : "bg-secondary/10 text-secondary border border-secondary/20 hover:bg-secondary/20") :
         theme === 'light' ? "bg-transparent text-text-muted hover:bg-white hover:shadow-sm hover:text-text-main border border-transparent hover:border-research-line" :
         "bg-transparent text-text-muted hover:bg-primary/5 hover:text-text-main"
@@ -1814,6 +1874,7 @@ function NavButton({ active, onClick, icon, label, theme, playSound, highlight =
       </div>
       <span className={cn(
         "text-[9px] md:text-[11px] font-mono uppercase tracking-[0.2em] transition-all duration-500",
+        isCollapsed ? "md:w-0 md:opacity-0 md:overflow-hidden whitespace-nowrap" : "md:w-auto md:opacity-100",
         active ? "font-black text-text-main italic" : 
         theme === 'light' ? "font-bold text-text-muted/80 group-hover:text-text-main" :
         "font-bold"

@@ -165,12 +165,31 @@ const PREDEFINED_DATASETS: Dataset[] = [
 
 export function DataExplorer() {
   const { t } = useLanguage();
+  const [customDatasets, setCustomDatasets] = useState<Dataset[]>(() => {
+    const saved = localStorage.getItem('custom_datasets');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        return [];
+      }
+    }
+    return [];
+  });
   const [activeDataset, setActiveDataset] = useState<Dataset>(PREDEFINED_DATASETS[0]);
   const [viewMode, setViewMode] = useState<'viz' | 'table'>('viz');
   const [chartType, setChartType] = useState<'line' | 'bar' | 'scatter' | 'area'>('line');
   const [searchQuery, setSearchQuery] = useState('');
   const [datasetSearch, setDatasetSearch] = useState('');
   const [uploadLoading, setUploadLoading] = useState(false);
+
+  React.useEffect(() => {
+    try {
+      localStorage.setItem('custom_datasets', JSON.stringify(customDatasets.map(ds => ({ ...ds, icon: undefined }))));
+    } catch (e) {
+      console.error('Failed to save to local storage, likely due to size limits:', e);
+    }
+  }, [customDatasets]);
 
   // --- Handlers ---
   const exportToCSV = () => {
@@ -197,12 +216,16 @@ export function DataExplorer() {
   };
 
   const filteredDatasets = useMemo(() => {
-    if (!datasetSearch) return PREDEFINED_DATASETS;
-    return PREDEFINED_DATASETS.filter(ds => 
+    const all = [
+      ...PREDEFINED_DATASETS, 
+      ...customDatasets.map(ds => ({ ...ds, icon: Upload }))
+    ];
+    if (!datasetSearch) return all;
+    return all.filter(ds => 
       ds.name.toLowerCase().includes(datasetSearch.toLowerCase()) || 
       ds.type.toLowerCase().includes(datasetSearch.toLowerCase())
     );
-  }, [datasetSearch]);
+  }, [datasetSearch, customDatasets]);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -219,12 +242,18 @@ export function DataExplorer() {
         if (file.name.endsWith('.json')) {
           data = JSON.parse(content);
         } else if (file.name.endsWith('.csv')) {
-          const lines = content.split('\n');
-          const headers = lines[0].split(',');
+          const lines = content.split('\n').filter(l => l.trim().length > 0);
+          const headers = lines[0].split(',').map(h => h.trim());
           data = lines.slice(1).map(line => {
             const values = line.split(',');
             return headers.reduce((obj, header, index) => {
-              obj[header.trim()] = values[index]?.trim();
+              const val = values[index]?.trim();
+              if (val !== undefined && val !== '') {
+                const num = Number(val);
+                obj[header] = !isNaN(num) ? num : val;
+              } else {
+                obj[header] = null;
+              }
               return obj;
             }, {} as any);
           });
@@ -235,10 +264,11 @@ export function DataExplorer() {
           name: file.name.split('.')[0],
           description: `Custom dataset uploaded on ${new Date().toLocaleDateString()}`,
           icon: Upload,
-          data: data.slice(0, 100), // Limit for performance
+          data: data,
           type: 'market'
         };
 
+        setCustomDatasets(prev => [...prev, newDataset]);
         setActiveDataset(newDataset);
       } catch (err) {
         console.error('Error parsing file', err);
@@ -249,6 +279,14 @@ export function DataExplorer() {
     };
 
     reader.readAsText(file);
+  };
+
+  const deleteCustomDataset = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCustomDatasets(prev => prev.filter(ds => ds.id !== id));
+    if (activeDataset.id === id) {
+      setActiveDataset(PREDEFINED_DATASETS[0]);
+    }
   };
 
   const filteredData = useMemo(() => {
@@ -412,24 +450,33 @@ export function DataExplorer() {
                   key={ds.id}
                   onClick={() => setActiveDataset(ds)}
                   className={cn(
-                    "w-full text-left p-3 rounded-xl border transition-all relative overflow-hidden group",
+                    "w-full text-left p-3 rounded-xl border transition-all relative overflow-hidden group flex justify-between items-center",
                     activeDataset.id === ds.id 
                       ? "border-primary bg-primary/5" 
                       : "border-transparent hover:bg-accent-soft/50"
                   )}
                 >
-                  <div className="flex items-center gap-3 relative z-10">
+                  <div className="flex items-center gap-3 relative z-10 flex-1 overflow-hidden">
                     <div className={cn(
-                      "w-7 h-7 rounded-lg flex items-center justify-center transition-colors", 
+                      "w-7 h-7 shrink-0 rounded-lg flex items-center justify-center transition-colors", 
                       activeDataset.id === ds.id ? "bg-primary text-white" : "bg-accent-soft text-text-muted/40"
                     )}>
                       <ds.icon className="w-3.5 h-3.5" />
                     </div>
-                    <div>
-                      <p className={cn("text-[10px] font-black uppercase tracking-tight", activeDataset.id === ds.id ? "text-text-main" : "text-text-main/60")}>{ds.name}</p>
-                      <p className="text-[7px] font-mono text-text-muted uppercase tracking-widest mt-0.5">{ds.type}</p>
+                    <div className="flex-1 overflow-hidden">
+                      <p className={cn("text-[10px] font-black uppercase tracking-tight truncate", activeDataset.id === ds.id ? "text-text-main" : "text-text-main/60")} title={ds.name}>{ds.name}</p>
+                      <p className="text-[7px] font-mono text-text-muted uppercase tracking-widest mt-0.5 truncate">{ds.type}</p>
                     </div>
                   </div>
+                  {ds.id.startsWith('custom-') && (
+                    <div 
+                       onClick={(e) => deleteCustomDataset(ds.id, e)}
+                       className="p-1.5 rounded-md hover:bg-red-500/20 text-red-500/50 hover:text-red-500 transition-colors z-20 shrink-0 opacity-0 group-hover:opacity-100"
+                       title="Delete Custom Dataset"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </div>
+                  )}
                 </button>
               ))}
             </div>

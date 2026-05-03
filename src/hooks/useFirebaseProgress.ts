@@ -72,29 +72,36 @@ export const useFirebaseProgress = () => {
       }
 
       const userRef = doc(db, 'users', user.uid);
+      let userSnap;
       try {
-        const userSnap = await getDoc(userRef);
+        userSnap = await getDoc(userRef);
+      } catch (error) {
+        handleFirestoreError(error, OperationType.GET, `users/${user.uid}`);
+        setLoading(false);
+        return;
+      }
 
-        if (userSnap.exists()) {
-          const data = userSnap.data();
-          setXp(data.xp || 0);
-          setLevel(data.level || 1);
-          setCompletedLessons(data.completedLessons || []);
-        } else {
-          // Initialize new user
+      if (userSnap.exists()) {
+        const data = userSnap.data();
+        setXp(data.xp || 0);
+        setLevel(data.level || 1);
+        setCompletedLessons(data.completedLessons || []);
+      } else {
+        // Initialize new user
+        try {
           await setDoc(userRef, {
             uid: user.uid,
-            displayName: user.displayName,
-            photoURL: user.photoURL,
+            displayName: user.displayName || null, // Ensure not undefined
+            photoURL: user.photoURL || null,       // Ensure not undefined
             xp: 0,
             level: 1,
             completedLessons: [],
             streak: 0,
             lastActive: serverTimestamp()
           });
+        } catch (error) {
+          handleFirestoreError(error, OperationType.CREATE, `users/${user.uid}`);
         }
-      } catch (error) {
-        handleFirestoreError(error, OperationType.GET, `users/${user.uid}`);
       }
       setLoading(false);
     };
@@ -161,8 +168,8 @@ export const useFirebaseProgress = () => {
     try {
       await setDoc(userRef, {
         uid: user.uid,
-        displayName: user.displayName,
-        photoURL: user.photoURL,
+        displayName: user.displayName || null,
+        photoURL: user.photoURL || null,
         xp: 0,
         level: 1,
         completedLessons: [],
