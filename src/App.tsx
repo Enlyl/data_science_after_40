@@ -20,6 +20,7 @@ import {
   Newspaper,
   Search,
   HelpCircle,
+  Map,
   Calendar,
   BookOpen,
   Lightbulb,
@@ -45,7 +46,8 @@ import {
   Palette,
   Volume2,
   Award,
-  Target
+  Target,
+  Globe
 } from 'lucide-react';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -499,7 +501,7 @@ function AppContent() {
               <NavButton 
                 active={activeTab === 'help'} 
                 onClick={() => {setActiveTab('help'); playSound('click');}} 
-                icon={<HelpCircle />} 
+                icon={<Map />} 
                 label={t('nav.help')} 
                 theme={theme}
                 playSound={playSound}

@@ -22,7 +22,7 @@ export const uiStrings: Translations = {
   'nav.planner': { ru: 'Стратегия (План)', en: 'ROADMAP' },
   'nav.curriculum': { ru: 'Подробная Стратегия', en: 'STRATEGY' },
   'nav.cabinet': { ru: 'Личное Дело', en: 'CLEARANCE' },
-  'nav.help': { ru: 'Старт (Руководство)', en: 'START (MANUAL)' },
+  'nav.help': { ru: 'Карта Обучения', en: 'LEARNING PATH' },
   'nav.settings': { ru: 'Настройки Системы', en: 'SYSTEM_CONFIG' },
   'nav.archive': { ru: 'Архив Исследований', en: 'ARCHIVE' },
   
@@ -34,7 +34,7 @@ export const uiStrings: Translations = {
   // Tabs / Nodes
   'node.main_hub': { ru: 'УЗЕЛ_01: ОСНОВНОЙ ХАБ (ОБУЧЕНИЕ)', en: 'NODE_01: MAIN_HUB (LECTURE_HALL)' },
   'node.data_lab': { ru: 'УЗЕЛ_02: DATA_LAB (ЛАБОРАТОРИЯ)', en: 'NODE_02: DATA_LAB (RESEARCH_CENTER)' },
-  'node.manual': { ru: 'УЗЕЛ_00: ИНИЦИАЦИЯ (ИНСТРУКЦИИ)', en: 'NODE_00: PROTOCOL_INIT (USER_GUIDE)' },
+  'node.manual': { ru: 'УЗЕЛ_00: СТРАТЕГИЯ ОБУЧЕНИЯ (ROADMAP)', en: 'NODE_00: PROTOCOL_INIT (LEARNING_PATH)' },
   'node.archive': { ru: 'УЗЕЛ_03: АРХИВ (БАЗА ЗНАНИЙ)', en: 'NODE_03: RESEARCH_ARCHIVE' },
 
   // Data Lab Specific

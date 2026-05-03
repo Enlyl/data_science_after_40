@@ -381,11 +381,11 @@ export function DataExplorer() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <motion.div layout className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Dataset Sidebar */}
-        <div className="lg:col-span-1 space-y-6">
-          <div className={cn(
-            "border rounded-[32px] p-6 shadow-xl relative overflow-hidden group h-fit sticky top-24",
+        <motion.div layout className="lg:col-span-1 space-y-6">
+          <motion.div layout className={cn(
+            "border rounded-[32px] p-6 shadow-xl relative overflow-hidden group h-fit lg:sticky lg:top-24",
             document.documentElement.getAttribute('data-theme') === 'light' ? "bg-white border-research-line" : "bg-card border-research-line"
           )}>
             <h3 className="text-xs font-mono font-black text-primary uppercase tracking-[0.3em] mb-4 flex items-center justify-between">
@@ -438,13 +438,13 @@ export function DataExplorer() {
                 <p className="text-[10px] font-mono text-text-muted uppercase tracking-widest opacity-40">No_Matches_Found</p>
               </div>
             )}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* Visualization & Table Area */}
-        <div className="lg:col-span-3 space-y-6">
+        <motion.div layout className="lg:col-span-3 space-y-6">
           {/* Aggregated Stats Breakdown */}
-          <div className="bg-card border border-research-line rounded-[32px] p-6 shadow-xl w-full">
+          <motion.div layout className="bg-card border border-research-line rounded-[32px] p-6 shadow-xl w-full">
             {aggregateStats ? (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="space-y-1">
@@ -469,10 +469,10 @@ export function DataExplorer() {
                   <p className="text-[9px] font-mono text-text-muted uppercase tracking-widest opacity-40">Calculating_Aggregates...</p>
                </div>
             )}
-          </div>
+          </motion.div>
 
           {/* Controls Bar */}
-          <div className="bg-card border border-research-line rounded-[32px] p-4 shadow-xl flex flex-col md:flex-row items-center justify-between gap-4">
+          <motion.div layout className="bg-card border border-research-line rounded-[32px] p-4 shadow-xl flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center bg-accent-soft p-1 rounded-2xl border border-research-line">
               <button 
                 onClick={() => setViewMode('viz')}
@@ -538,7 +538,7 @@ export function DataExplorer() {
                 className="w-full bg-accent-soft border border-research-line rounded-2xl pl-12 pr-4 py-3 text-[10px] font-mono text-text-main focus:border-primary focus:outline-none transition-all placeholder:text-text-muted/30 uppercase tracking-widest"
               />
             </div>
-          </div>
+          </motion.div>
 
           <AnimatePresence mode="wait">
             {viewMode === 'viz' && showSettings && (
@@ -946,8 +946,8 @@ export function DataExplorer() {
               </motion.div>
             )}
           </AnimatePresence>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }
