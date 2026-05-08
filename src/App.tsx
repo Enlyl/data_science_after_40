@@ -23,6 +23,7 @@ import {
   Map,
   Calendar,
   BookOpen,
+  Database,
   Lightbulb,
   Settings,
   ShieldCheck,
@@ -47,7 +48,8 @@ import {
   Volume2,
   Award,
   Target,
-  Globe
+  Globe,
+  LogOut
 } from 'lucide-react';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -109,9 +111,10 @@ function AppContent() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(() => {
     return localStorage.getItem('notifications_enabled') === 'true';
   });
-  const [theme, setThemeState] = useState<'research' | 'light' | 'cyberpunk' | 'matrix' | 'spectrum' | 'space'>(() => {
-    return (localStorage.getItem('app_theme') as any) || 'research';
+  const [theme, setThemeState] = useState<'light' | 'dark' | 'cyberpunk'>(() => {
+    return (localStorage.getItem('app_theme') as any) || 'dark';
   });
+
   const [isThemeTransitioning, setIsThemeTransitioning] = useState(false);
 
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
@@ -124,7 +127,7 @@ function AppContent() {
     localStorage.setItem('sidebar_collapsed', newState.toString());
   };
 
-  const setTheme = (newTheme: 'research' | 'light' | 'cyberpunk' | 'matrix' | 'spectrum' | 'space') => {
+  const setTheme = (newTheme: 'light' | 'dark' | 'cyberpunk') => {
     setIsThemeTransitioning(true);
     setTimeout(() => {
       setThemeState(newTheme);
@@ -153,15 +156,8 @@ function AppContent() {
         case 'cyberpunk':
           oscillator.type = 'sawtooth';
           break;
-        case 'matrix':
-          oscillator.type = 'square';
-          break;
-        case 'spectrum':
-          oscillator.type = 'square';
-          break;
-        case 'space':
-          oscillator.type = 'sine';
-          break;
+        case 'dark':
+        case 'light':
         default:
           oscillator.type = 'triangle';
       }
@@ -295,7 +291,7 @@ function AppContent() {
   );
 
   const categoryProgress = React.useMemo(() => {
-    const categories: Lesson['category'][] = ['Analytics', 'Statistics', 'Python', 'Machine Learning'];
+    const categories: Lesson['category'][] = ['Analytics', 'Statistics', 'Python', 'Machine Learning', 'SQL'];
     return categories.map(cat => {
       const totalInCategory = LESSONS.filter(l => l.category === cat).length;
       const completedInCategory = LESSONS.filter(l => l.category === cat && completedLessons.includes(l.id)).length;
@@ -380,15 +376,15 @@ function AppContent() {
     return (
       <div className="min-h-screen bg-bg-app flex flex-col items-center justify-center relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-primary/20 rounded-full blur-[100px] animate-pulse" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-primary/10 rounded-full blur-[100px] animate-pulse" />
         </div>
         <div className="relative">
-          <div className="w-20 h-20 border-t-2 border-primary rounded-full animate-spin mb-6 shadow-[0_0_15px_rgba(0,209,255,0.4)]" />
-          <div className="absolute inset-0 flex items-center justify-center">
-             <Cpu className="w-8 h-8 text-primary" />
+          <div className="w-16 h-16 border-t-2 border-primary/50 rounded-full animate-spin mb-6" />
+          <div className="absolute inset-0 flex items-center justify-center pb-6">
+             <Cpu className="w-6 h-6 text-primary" />
           </div>
         </div>
-        <p className="text-primary font-mono text-[10px] uppercase tracking-[0.5em] animate-pulse">{t('auth.loading')}</p>
+        <p className="text-text-muted font-medium text-sm tracking-widest uppercase animate-pulse">{t('auth.loading')}</p>
       </div>
     );
   }
@@ -397,37 +393,29 @@ function AppContent() {
     return (
       <div className="min-h-screen bg-bg-app text-text-main flex flex-col items-center justify-center p-6 text-center relative overflow-hidden">
         {/* Background Grid */}
-        <div className="absolute inset-0 opacity-[0.05] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)', backgroundSize: '32px 32px' }} />
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)', backgroundSize: '32px 32px' }} />
         
-        <div className="w-32 h-32 bg-primary/5 rounded-[40px] flex items-center justify-center text-primary mb-12 border border-primary/20 relative group">
-            <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-125 group-hover:scale-150 transition-transform duration-1000" />
-            <div className="absolute inset-0 border border-primary/40 rounded-[40px] animate-orbit opacity-20" />
-            <BarChart3 className="w-14 h-14 relative z-10 drop-shadow-[0_0_10px_#00d1ff]" />
+        <div className="w-24 h-24 bg-accent-soft rounded-3xl flex items-center justify-center text-primary mb-12 border border-border relative group shadow-sm hover:shadow-md transition-all">
+            <div className="absolute inset-0 bg-primary/10 blur-xl rounded-full scale-110 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+            <BarChart3 className="w-10 h-10 relative z-10" />
         </div>
         
-        <div className="space-y-2 mb-16 relative z-10">
-          <h1 className="text-5xl font-black uppercase tracking-tighter italic">{t('auth.title')}</h1>
-          <p className="text-primary font-mono text-xs uppercase tracking-[0.4em] opacity-60">{t('auth.subtitle')}</p>
+        <div className="space-y-3 mb-10 relative z-10">
+          <h1 className="text-4xl md:text-5xl font-display font-bold tracking-tight text-text-main">{t('auth.title')}</h1>
+          <p className="text-text-muted font-medium text-sm md:text-base">{t('auth.subtitle')}</p>
         </div>
         
-        <p className="text-slate-400 text-center max-w-sm mb-12 leading-relaxed text-[11px] font-mono uppercase tracking-widest opacity-80">
+        <p className="text-text-muted/80 text-center max-w-sm mb-12 leading-relaxed text-sm">
            {t('auth.desc')}
         </p>
         
         <button 
           onClick={login}
-          className="group relative bg-card border border-primary/30 text-primary px-16 py-6 rounded-[24px] font-black text-xl shadow-[0_0_30px_rgba(0,209,255,0.1)] hover:border-primary hover:shadow-[0_0_40px_rgba(0,209,255,0.2)] active:scale-95 transition-all flex items-center gap-4 uppercase tracking-tighter overflow-hidden"
+          className="group relative bg-primary text-white px-10 py-4 rounded-xl font-semibold shadow-sm hover:shadow-md hover:bg-primary/90 active:scale-[0.98] transition-all flex items-center gap-3 overflow-hidden"
         >
-          <div className="absolute inset-0 bg-primary opacity-0 group-hover:opacity-10 transition-opacity" />
-          <User className="w-6 h-6 group-hover:rotate-12 transition-transform" /> 
+          <User className="w-5 h-5 group-hover:rotate-12 transition-transform" /> 
           <span className="relative z-10">{t('auth.login')}</span>
         </button>
-
-        <div className="mt-20 flex items-center gap-8 opacity-20 grayscale brightness-200">
-           <div className="w-12 h-1 bg-white rounded-full" />
-           <div className="w-2 h-2 bg-white rounded-full" />
-           <div className="w-12 h-1 bg-white rounded-full" />
-        </div>
       </div>
     );
   }
@@ -486,22 +474,22 @@ function AppContent() {
 
       {/* Sidebar Navigation */}
       <nav className={cn(
-        "fixed bottom-0 left-0 right-0 z-50 md:sticky md:top-0 md:h-screen md:flex-col border-t md:border-t-0 md:border-r border-research-line py-2 px-4 flex justify-between items-center md:items-stretch overflow-y-auto no-scrollbar transition-all duration-500 shadow-2xl md:shadow-none",
-        isSidebarCollapsed ? "md:w-[88px] md:py-8 md:px-3" : "md:w-[280px] md:py-10 md:px-6",
-        theme === 'light' ? "bg-white/95" : "bg-card/80 backdrop-blur-3xl"
+        "fixed bottom-0 left-0 right-0 z-50 md:sticky md:top-0 md:h-screen md:flex-col border-t md:border-t-0 md:border-r border-border py-2 px-4 flex justify-between items-center md:items-stretch overflow-y-auto no-scrollbar transition-all duration-300",
+        isSidebarCollapsed ? "md:w-[88px] md:py-6 md:px-3" : "md:w-[280px] md:py-8 md:px-4",
+        theme === 'light' ? "bg-bg-app md:bg-white" : "bg-bg-app md:bg-card"
       )}>
         <div 
           onClick={() => setActiveTab('help')}
-          className={cn("hidden md:flex flex-col gap-1 mb-12 px-2 cursor-pointer group", isSidebarCollapsed && "items-center px-0")}
+          className={cn("hidden md:flex flex-col gap-1 mb-8 px-2 cursor-pointer group", isSidebarCollapsed && "items-center px-0")}
         >
-          <div className="flex items-center gap-4">
-             <div className="w-12 h-12 shrink-0 bg-primary/10 border border-primary/20 rounded-2xl flex items-center justify-center text-primary group-hover:scale-110 transition-all duration-500 shadow-lg shadow-primary/5 group-hover:shadow-primary/20">
-               <Atom className="w-7 h-7 animate-spin-slow" />
+          <div className="flex items-center gap-3">
+             <div className="w-10 h-10 shrink-0 bg-primary/10 rounded-xl flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all duration-300">
+               <Atom className="w-5 h-5 animate-spin-slow" />
              </div>
              {!isSidebarCollapsed && (
                <div className="flex flex-col">
-                  <span className="font-black text-2xl tracking-tighter text-text-main leading-none italic uppercase">STEM_DATA</span>
-                  <span className="font-bold text-[10px] text-primary tracking-[0.3em] mt-1.5 opacity-80 uppercase">VIRTUAL_CORE</span>
+                  <span className="font-display font-bold text-xl text-text-main leading-none">EduCore</span>
+                  <span className="font-medium text-[10px] text-text-muted mt-1 uppercase tracking-wider">Learning Platform</span>
                </div>
              )}
           </div>
@@ -509,7 +497,7 @@ function AppContent() {
         
         <div className="flex gap-2 md:flex-col md:gap-1 mx-0 w-full justify-start overflow-x-auto md:overflow-x-visible no-scrollbar pb-2 md:pb-0">
           <div className="hidden md:block mb-4">
-            {!isSidebarCollapsed && <p className="text-[10px] font-black text-primary/40 uppercase tracking-[0.3em] px-2 mb-2 italic">Essential_Tools</p>}
+            {!isSidebarCollapsed && <p className="text-[10px] font-semibold text-text-muted/60 uppercase tracking-widest px-4 mb-2">Essential</p>}
             <div className="space-y-1">
               <NavButton 
                 active={activeTab === 'help'} 
@@ -533,10 +521,10 @@ function AppContent() {
             </div>
           </div>
 
-          <div className="hidden md:block w-full h-px bg-research-line my-4 opacity-30" />
+          <div className="hidden md:block w-8 h-px bg-border my-3 mx-4 opacity-40" />
 
           <div className="hidden md:block mb-4">
-            {!isSidebarCollapsed && <p className="text-[10px] font-black text-secondary/40 uppercase tracking-[0.3em] px-2 mb-2 italic">Data_Science_Lab</p>}
+            {!isSidebarCollapsed && <p className="text-[10px] font-semibold text-text-muted/60 uppercase tracking-widest px-4 mb-2">Learning</p>}
             <div className="space-y-1">
               <NavButton 
                 active={activeTab === 'lecture_hall'} 
@@ -577,10 +565,10 @@ function AppContent() {
             </div>
           </div>
 
-          <div className="hidden md:block w-full h-px bg-research-line my-4 opacity-30" />
+          <div className="hidden md:block w-8 h-px bg-border my-3 mx-4 opacity-40" />
 
           <div className="hidden md:block mb-4">
-            {!isSidebarCollapsed && <p className="text-[10px] font-black text-text-muted/40 uppercase tracking-[0.3em] px-2 mb-2 italic">Growth_Hub</p>}
+            {!isSidebarCollapsed && <p className="text-[10px] font-semibold text-text-muted/60 uppercase tracking-widest px-4 mb-2">Growth</p>}
             <div className="space-y-1">
               <NavButton 
                 active={activeTab === 'skills'} 
@@ -612,7 +600,7 @@ function AppContent() {
             </div>
           </div>
 
-          <div className="hidden md:block w-full h-px bg-research-line my-4 opacity-30" />
+          <div className="hidden md:block w-8 h-px bg-border my-3 mx-4 opacity-40" />
           
           <div className="space-y-1">
             <NavButton 
@@ -639,57 +627,45 @@ function AppContent() {
         <div className="hidden md:block mt-auto space-y-4">
           {!isSidebarCollapsed && (
             <>
-           <div className="bg-primary/5 border border-primary/10 p-5 rounded-2xl relative overflow-hidden group">
-               <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+           <div className="bg-accent-soft border border-border p-5 rounded-2xl relative overflow-hidden group">
                <div className="flex justify-between items-center mb-3">
-                 <p className="text-[10px] font-mono font-bold text-primary/60 uppercase tracking-[0.2em] tracking-widest leading-none text-left">{t('status.rank')}</p>
-                 <span className="text-[10px] font-mono font-bold text-primary">LVL_{level < 10 ? `0${level}` : level}</span>
+                 <p className="text-xs font-medium text-text-main">{t('status.rank')}</p>
+                 <span className="text-xs font-semibold text-primary">Level {level}</span>
                </div>
-               <div className="h-1.5 bg-card/20 rounded-full overflow-hidden border border-research-line">
+               <div className="h-1.5 bg-border rounded-full overflow-hidden">
                    <div 
-                     className="h-full bg-primary shadow-[0_0_10px_#00d1ff] transition-all duration-700 ease-out" 
+                     className="h-full bg-primary transition-all duration-700 ease-out" 
                      style={{ width: `${(xp % 500) / 5}%` }}
                    />
                </div>
                <div className="flex justify-between items-center mt-3">
-                  <span className="text-[9px] font-mono text-text-muted/40 uppercase tracking-widest">{xp % 500} / 500 XP</span>
-                  <span className="text-xs font-black text-text-main italic">{Math.round((xp % 500) / 5)}%</span>
+                  <span className="text-[10px] font-medium text-text-muted">{xp % 500} / 500 XP</span>
+                  <span className="text-[10px] font-bold text-text-main">{Math.round((xp % 500) / 5)}%</span>
                </div>
            </div>
 
-           <div className="bg-secondary/5 border border-secondary/10 p-4 rounded-2xl relative overflow-hidden group">
-             <div className="flex items-center gap-3 mb-2">
-                <div className="w-2 h-2 rounded-full bg-secondary shadow-[0_0_8px_var(--color-secondary)] animate-pulse" />
-                <span className="text-[9px] font-mono font-bold text-secondary uppercase tracking-widest">MISSION_SYNC</span>
-             </div>
+           <div className="bg-transparent border border-border p-4 rounded-2xl relative overflow-hidden group">
              <div className="flex justify-between items-end">
-                <div className="flex items-baseline gap-1">
-                   <span className="text-2xl font-black italic text-text-main">{completedLessons.length}</span>
-                   <span className="text-[10px] text-text-muted font-mono">/ {LESSONS.length}</span>
+                <div className="flex flex-col gap-1">
+                   <span className="text-xl font-bold text-text-main leading-none">{completedLessons.length}</span>
+                   <div className="text-[10px] text-text-muted font-medium">Completed Lessons</div>
                 </div>
-                <div className="text-[8px] font-mono text-text-muted uppercase tracking-widest opacity-60 pb-1">COMPLETED</div>
+                <div className="text-xs font-medium text-text-muted pb-1">/ {LESSONS.length}</div>
              </div>
-           </div>
-
-           <div className="px-2 py-4 border-t border-research-line space-y-3">
-              <div className="flex items-center justify-between text-[8px] font-mono font-black uppercase tracking-[0.2em] text-white/30">
-                 <span>{t('status.uplink')}</span>
-                 <span className="text-primary text-[10px] animate-pulse">SECURED</span>
-              </div>
            </div>
            </>
           )}
           
           {/* Collapsed rank summary */}
           {isSidebarCollapsed && (
-            <div className="flex flex-col items-center gap-4 py-4 border-t border-research-line">
+            <div className="flex flex-col items-center gap-4 py-4 border-t border-border">
                <div className="flex flex-col items-center justify-center relative w-10 h-10 group cursor-help">
                  <svg className="w-10 h-10 -rotate-90">
-                    <circle cx="20" cy="20" r="18" fill="transparent" stroke="var(--color-research-line)" strokeWidth="2" />
-                    <circle cx="20" cy="20" r="18" fill="transparent" stroke="var(--color-primary)" strokeWidth="2" strokeDasharray="113" strokeDashoffset={113 - (113 * ((xp % 500) / 500))} className="transition-all duration-700 ease-out drop-shadow-[0_0_5px_var(--color-primary)]" />
+                    <circle cx="20" cy="20" r="18" fill="transparent" stroke="var(--color-border)" strokeWidth="2" />
+                    <circle cx="20" cy="20" r="18" fill="transparent" stroke="var(--color-primary)" strokeWidth="2" strokeDasharray="113" strokeDashoffset={113 - (113 * ((xp % 500) / 500))} className="transition-all duration-700 ease-out" />
                  </svg>
-                 <span className="absolute text-[8px] font-black text-primary">{level}</span>
-                 <div className="absolute left-14 hidden group-hover:flex bg-card border border-research-line px-3 py-2 rounded-lg text-xs whitespace-nowrap z-50">
+                 <span className="absolute text-[10px] font-bold text-primary">{level}</span>
+                 <div className="absolute left-14 hidden group-hover:flex bg-card border border-border px-3 py-2 rounded-lg text-xs whitespace-nowrap z-50 shadow-sm">
                     {xp % 500} / 500 XP
                  </div>
                </div>
@@ -723,66 +699,68 @@ function AppContent() {
       {/* Main Content */}
       <main className="flex-1 min-h-screen pt-4 pb-28 md:pt-0 md:pb-12 md:px-8 lg:px-12 xl:px-16 w-full relative z-10 flex flex-col">
         {/* Persistent Top Header */}
-        <header className="sticky top-0 z-40 bg-bg-app/90 backdrop-blur-xl border-b border-research-line px-4 md:px-8 py-4 flex items-center justify-between">
+        <header className="sticky top-0 z-40 bg-bg-app/90 backdrop-blur-xl border-b border-border px-4 md:px-8 py-3 flex items-center justify-between">
            <div className="flex items-center gap-4 md:gap-8 overflow-hidden">
-              <div className="flex items-center gap-2.5">
-                 <div className="w-2 h-2 rounded-full bg-success shadow-[0_0_10px_var(--color-success)] animate-pulse" />
-                 <span className="text-[10px] font-mono text-success uppercase tracking-[0.2em] font-black whitespace-nowrap">Uplink_Encrypted</span>
+              <div className="flex items-center gap-2">
+                 <div className="w-2 h-2 rounded-full bg-success" />
+                 <span className="text-xs font-semibold text-text-muted mt-0.5">Online</span>
               </div>
-              <div className="hidden sm:block w-px h-5 bg-research-line opacity-20" />
+              <div className="hidden sm:block w-px h-5 bg-border opacity-60" />
               <div className="flex items-center gap-6">
-                 <div className="flex flex-col">
-                    <span className="text-[8px] font-mono text-text-muted/40 uppercase tracking-widest font-black leading-none mb-1">Clearance_Matrix</span>
-                    <p className="text-[11px] font-black text-text-main italic tracking-tight uppercase leading-none">
-                      {xp.toLocaleString()} <span className="text-primary ml-1 opacity-60">XP</span>
+                 <div className="flex flex-col justify-center">
+                    <p className="text-sm font-bold text-text-main leading-none">
+                      {xp.toLocaleString()} <span className="text-primary font-medium ml-1">XP</span>
                     </p>
                  </div>
-                 <div className="flex flex-col">
-                    <span className="text-[8px] font-mono text-text-muted/40 uppercase tracking-widest font-black leading-none mb-1">Node_Operator</span>
-                    <p className="text-[11px] font-black text-text-main italic tracking-tight uppercase leading-none">
-                      LEVEL_{level < 10 ? `0${level}` : level}
+                 <div className="flex flex-col justify-center">
+                    <p className="text-sm font-bold text-text-main leading-none">
+                      Level {level}
                     </p>
                  </div>
               </div>
            </div>
 
            <div className="flex items-center gap-4">
-              <div className="hidden md:flex items-center bg-accent-soft p-1 rounded-xl border border-research-line">
+              <div className="hidden md:flex items-center bg-accent-soft p-1 rounded-xl border border-border">
                  <button 
-                  onClick={() => setTheme('research')}
-                  className={cn("p-2 rounded-lg transition-all", theme === 'research' ? "bg-card text-primary shadow-lg border border-research-line/50" : "text-text-muted hover:text-text-main")}
+                  onClick={() => setTheme('dark')}
+                  className={cn("p-2 rounded-lg transition-all", theme === 'dark' ? "bg-card text-primary shadow-sm border border-border" : "text-text-muted hover:text-text-main")}
                  >
                     <Moon className="w-4 h-4" />
                  </button>
                  <button 
                   onClick={() => setTheme('light')}
-                  className={cn("p-2 rounded-lg transition-all", theme === 'light' ? "bg-white text-primary shadow-lg border border-research-line/50" : "text-text-muted hover:text-text-main")}
+                  className={cn("p-2 rounded-lg transition-all", theme === 'light' ? "bg-card text-primary shadow-sm border border-border" : "text-text-muted hover:text-text-main")}
                  >
                     <Sun className="w-4 h-4" />
                  </button>
               </div>
 
-              <div className="w-px h-5 bg-research-line opacity-20 hidden md:block" />
+              <div className="w-px h-5 bg-border opacity-40 hidden md:block" />
 
               <button 
                 onClick={() => setLanguage(language === 'en' ? 'ru' : 'en')}
-                className="flex items-center gap-2 px-4 py-2 bg-accent-soft/50 border border-research-line rounded-xl text-[10px] font-black text-text-muted hover:text-primary hover:bg-white transition-all uppercase tracking-widest shadow-sm"
+                className="flex items-center gap-2 px-3 py-2 bg-accent-soft border border-border rounded-xl text-xs font-semibold text-text-muted hover:text-text-main hover:bg-card transition-all shadow-sm"
               >
                  <Globe className="w-4 h-4" />
                  <span>{language.toUpperCase()}</span>
               </button>
 
-              <div className="w-px h-5 bg-research-line opacity-20 hidden md:block" />
+              <div className="w-px h-5 bg-border opacity-40 hidden md:block" />
 
               <button 
                 onClick={() => setActiveTab('cabinet')}
-                className="w-10 h-10 bg-card rounded-xl border border-research-line flex items-center justify-center hover:border-primary/50 transition-all cursor-pointer group overflow-hidden shadow-sm"
+                className="w-10 h-10 bg-card rounded-xl border border-border flex items-center justify-center hover:border-primary/50 transition-all cursor-pointer group overflow-hidden shadow-sm"
               >
                 {user?.photoURL ? (
                   <img src={user.photoURL} alt="User" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                 ) : (
                   <UserCircle className="w-6 h-6 text-text-muted group-hover:text-primary transition-colors" />
                 )}
+              </button>
+
+              <button onClick={() => logout()} className="w-10 h-10 hidden md:flex rounded-xl bg-accent-soft hover:bg-red-500/10 border border-border hover:border-red-500/30 items-center justify-center text-text-muted hover:text-red-500 transition-colors group">
+                 <LogOut className="w-4 h-4" />
               </button>
            </div>
         </header>
@@ -798,47 +776,45 @@ function AppContent() {
               className="space-y-12"
             >
               {/* Refined Header */}
-              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-4 md:px-0">
-                <div className="space-y-2">
-                  <h1 className="text-5xl font-black text-text-main tracking-tighter uppercase italic drop-shadow-sm">
-                    {t('auth.login')}: <span className="text-primary">{user?.displayName?.split(' ')[0] || 'RESEARCHER'}</span>
+              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-4 md:px-0 mb-8">
+                <div className="space-y-1">
+                  <h1 className="text-4xl font-display font-bold text-text-main tracking-tight">
+                    Welcome back, <span className="text-primary">{user?.displayName?.split(' ')[0] || 'Student'}</span>
                   </h1>
-                  <p className="text-text-muted font-mono opacity-80 uppercase tracking-[0.4em] text-[10px] flex items-center gap-3">
-                    <div className="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_10px_#00d1ff] animate-pulse" />
-                    {t('status.uplink')}: {t('status.connection')}
+                  <p className="text-text-muted font-medium text-sm flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-success" />
+                    Ready to learn
                   </p>
                 </div>
               </div>
 
-              {/* Current Challenge Hero - Astrophysics style */}
-              <section className="mx-4 md:mx-0 bg-card border border-research-line rounded-[40px] p-10 text-white shadow-2xl flex flex-col md:flex-row justify-between items-center gap-8 relative overflow-hidden group">
+              {/* Current Challenge Hero */}
+              <section className="mx-4 md:mx-0 bg-card border border-border rounded-3xl p-8 md:p-10 shadow-sm flex flex-col md:flex-row justify-between items-center gap-8 relative overflow-hidden group hover:shadow-md transition-shadow">
                 {/* Decorative Elements */}
-                <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-primary/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-[100px] pointer-events-none group-hover:bg-primary/20 transition-colors duration-700" />
-                <div className="absolute inset-0 opacity-[0.05] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '24px 24px' }} />
+                <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-[80px] pointer-events-none group-hover:bg-primary/10 transition-colors duration-700" />
+                <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)', backgroundSize: '24px 24px' }} />
                 
-                <div className="space-y-6 text-center md:text-left relative z-10">
-                  <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 px-4 py-1.5 rounded-full">
-                    <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                    <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-primary">PRIORITY_RESEARCH_042</span>
+                <div className="space-y-5 text-center md:text-left relative z-10 w-full max-w-2xl">
+                  <div className="inline-flex items-center gap-2 bg-primary/10 px-3 py-1 rounded-full text-xs font-semibold text-primary">
+                    Next Mission
                   </div>
-                  <div className="space-y-2">
-                    <h2 className="text-5xl font-black leading-none tracking-tighter uppercase italic">{language === 'en' ? 'Cosmos_Analysis: ' : 'Космос: '} <br/><span className="text-primary overflow-visible">{language === 'en' ? 'Spectral_Data' : 'Спектральные Данные'}</span></h2>
-                    <p className="text-secondary font-mono text-[10px] uppercase tracking-[0.4em] opacity-80">Sector_C12 // Neural_Link_Active</p>
+                  <div className="space-y-1">
+                    <h2 className="text-3xl md:text-4xl font-display font-bold leading-tight tracking-tight">Cosmos Analysis: <br/><span className="text-primary">{language === 'en' ? 'Spectral Data' : 'Спектральные Данные'}</span></h2>
+                    <p className="text-text-muted text-sm font-medium">Data Modeling & Linear Regression</p>
                   </div>
-                  <p className="text-text-muted max-w-lg leading-relaxed opacity-90 text-lg font-medium italic">
+                  <p className="text-text-muted leading-relaxed">
                     {language === 'en' 
                       ? 'Investigate the expansion of the universe. Decode redshift signatures using linear regression patterns.'
                       : 'Исследуй расширение Вселенной. Декодируй сигнатуры красного смещения с помощью паттернов линейной регрессии.'}
                   </p>
                 </div>
                 
-                <div className="relative group/btn z-10">
-                  <div className="absolute inset-0 bg-primary/40 blur-2xl rounded-full scale-0 group-hover/btn:scale-100 transition-transform duration-500" />
+                <div className="relative group/btn z-10 w-full md:w-auto">
                   <button 
                     onClick={() => setSelectedLesson(LESSONS[0])}
-                    className="bg-white text-[#010204] px-10 py-5 rounded-[22px] font-black text-lg shadow-2xl hover:scale-105 active:scale-95 transition-all whitespace-nowrap relative flex items-center gap-3 group-hover:bg-primary group-hover:text-white"
+                    className="w-full md:w-auto bg-primary text-white px-8 py-4 rounded-xl font-semibold shadow-sm hover:shadow-md hover:bg-primary/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                   >
-                    <Play className="w-6 h-6 fill-current" /> {t('lesson.start')}
+                    <Play className="w-5 h-5 fill-current" /> {t('lesson.start')}
                   </button>
                 </div>
               </section>
@@ -848,26 +824,26 @@ function AppContent() {
                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 px-2">
                     <div className="relative group flex-1 max-w-xl">
                       <div className="absolute inset-0 bg-primary/5 blur-xl group-focus-within:bg-primary/10 transition-colors" />
-                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/60 group-focus-within:text-primary transition-colors z-10" />
+                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted group-focus-within:text-primary transition-colors z-10" />
                       <input 
                         type="text"
                         placeholder={t('search.placeholder')}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-12 pr-4 py-4 bg-card/80 backdrop-blur-xl border border-research-line rounded-3xl focus:border-primary outline-none transition-all text-sm font-mono placeholder:text-text-muted/20 relative z-10 uppercase tracking-widest"
+                        className="w-full pl-12 pr-4 py-3 bg-card border border-border rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-medium placeholder:text-text-muted relative z-10"
                       />
                     </div>
                     <div className="flex items-center gap-4">
                       <div className="flex flex-col items-end">
-                         <span className="text-[10px] font-mono text-text-muted uppercase tracking-widest">Active_Modules</span>
-                         <span className="text-lg font-black text-white italic">{filteredLessons.length}</span>
+                         <span className="text-xs font-semibold text-text-muted">Total Modules</span>
+                         <span className="text-xl font-bold text-text-main leading-none mt-1">{filteredLessons.length}</span>
                       </div>
-                      <div className="w-px h-8 bg-research-line mx-2" />
+                      <div className="w-px h-8 bg-border mx-2" />
                       <button 
                         onClick={() => setActiveTab('research_archive')}
-                        className="bg-accent-soft border border-research-line px-5 py-3 rounded-2xl text-primary font-bold text-[10px] uppercase tracking-[0.2em] hover:bg-primary hover:text-white transition-all shadow-lg active:scale-95"
+                        className="bg-card border border-border px-4 py-2 rounded-xl text-primary font-semibold text-sm hover:bg-primary/5 transition-all shadow-sm active:scale-95"
                       >
-                        Launch_Archive
+                        All Lessons
                       </button>
                     </div>
                   </div>
@@ -900,11 +876,10 @@ function AppContent() {
                 </div>
 
                 <div className="lg:col-span-1 h-fit lg:sticky lg:top-10 space-y-4">
-                  <div className="flex items-center justify-between px-2">
-                    <h3 className="font-black text-text-main text-lg uppercase tracking-tighter">Свежий поток</h3>
-                    <div className="flex gap-1">
-                       <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
-                       <div className="w-1.5 h-1.5 rounded-full bg-success" />
+                  <div className="flex items-center justify-between px-2 mb-2">
+                    <h3 className="font-display font-bold text-text-main text-lg">Latest News</h3>
+                    <div className="flex gap-2">
+                       <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
                     </div>
                   </div>
                   <div className="h-[650px]">
@@ -921,17 +896,17 @@ function AppContent() {
               initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.98 }}
-              className="space-y-12 px-4 md:px-0 max-w-[1600px] mx-auto"
+              className="space-y-8 px-4 md:px-0 max-w-[1600px] mx-auto"
             >
-              <div className="flex flex-col xl:flex-row gap-8 items-start xl:items-center justify-between">
-                <div className="relative flex-1 group w-full">
-                  <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted/40 group-focus-within:text-primary transition-colors z-10" />
+              <div className="flex flex-col xl:flex-row gap-6 items-start xl:items-center justify-between">
+                <div className="relative flex-1 group w-full max-w-xl">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted group-focus-within:text-primary transition-colors z-10" />
                   <input 
                     type="text"
-                    placeholder={language === 'en' ? 'Search_Topics...' : 'ПОИСК_ЗНАНИЙ...'}
+                    placeholder={language === 'en' ? 'Search topics...' : 'Поиск знаний...'}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-14 pr-6 py-4 bg-accent-soft border border-research-line rounded-2xl focus:border-primary outline-none transition-all text-base font-black placeholder:text-text-muted/20 uppercase tracking-tighter"
+                    className="w-full pl-12 pr-4 py-3 bg-card border border-border rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-medium placeholder:text-text-muted relative z-10"
                   />
                 </div>
 
@@ -941,13 +916,13 @@ function AppContent() {
                       key={cat}
                       onClick={() => setActiveCategory(cat)}
                       className={cn(
-                        "px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all border",
+                        "px-4 py-2 rounded-xl text-xs font-semibold transition-all border",
                         activeCategory === cat 
-                          ? "bg-primary text-white border-primary shadow-lg shadow-primary/20" 
-                          : "bg-card text-text-muted hover:bg-accent-soft border-research-line"
+                          ? "bg-primary text-white border-primary shadow-sm" 
+                          : "bg-card text-text-muted hover:bg-accent-soft border-border"
                       )}
                     >
-                      {cat.toUpperCase()}
+                      {cat}
                     </button>
                   ))}
                 </div>
@@ -993,25 +968,25 @@ function AppContent() {
               exit={{ opacity: 0, x: -20 }}
               className="space-y-8 px-4 md:px-0"
             >
-              <header className="flex flex-col xl:flex-row xl:items-end justify-between gap-8 px-2">
-                <div className="space-y-3">
-                  <h1 className="text-4xl font-black text-white uppercase tracking-tighter italic">{t('nav.archive')}</h1>
-                  <p className="text-text-muted uppercase text-[10px] font-mono tracking-[0.4em] opacity-60 leading-none">{t('tab.library.desc')}</p>
+              <header className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 px-2">
+                <div className="space-y-1">
+                  <h1 className="text-3xl font-display font-bold text-text-main tracking-tight">{t('nav.archive')}</h1>
+                  <p className="text-text-muted text-sm font-medium">{t('tab.library.desc')}</p>
                 </div>
-                <div className="flex flex-col gap-4 items-start xl:items-end w-full xl:w-auto">
+                <div className="flex flex-col gap-3 items-start xl:items-end w-full xl:w-auto">
                    <div className="flex flex-wrap gap-2">
-                    {['All', 'Analytics', 'Statistics', 'Python', 'Machine Learning'].map(cat => (
+                    {['All', 'Analytics', 'Statistics', 'Python', 'Machine Learning', 'SQL'].map(cat => (
                       <button
                         key={cat}
                         onClick={() => setActiveCategory(cat)}
                         className={cn(
-                          "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border shrink-0",
+                          "px-4 py-2 rounded-xl text-xs font-semibold transition-all border shrink-0",
                           activeCategory === cat 
-                            ? "bg-primary text-white border-primary shadow-[0_0_15px_var(--color-primary)]" 
-                            : "bg-card text-text-muted hover:bg-accent-soft border-research-line"
+                            ? "bg-primary text-white border-primary shadow-sm" 
+                            : "bg-card text-text-muted hover:bg-accent-soft border-border"
                         )}
                       >
-                        {cat === 'All' ? 'ALL_TOPICS' : cat.toUpperCase()}
+                        {cat}
                       </button>
                     ))}
                   </div>
@@ -1021,28 +996,28 @@ function AppContent() {
                         key={lvl}
                         onClick={() => setActiveLevel(lvl as any)}
                         className={cn(
-                          "px-3 py-1.5 rounded-lg text-[9px] font-mono uppercase tracking-[0.2em] transition-all border",
+                          "px-3 py-1.5 rounded-lg text-xs font-medium transition-all border",
                           activeLevel === lvl 
-                            ? "bg-secondary text-white border-secondary shadow-[0_0_10px_var(--color-secondary)]" 
-                            : "bg-white/5 text-text-muted hover:bg-white/10 border-research-line"
+                            ? "bg-accent-soft text-text-main border-border shadow-sm" 
+                            : "bg-transparent text-text-muted hover:bg-accent-soft/50 border-border"
                         )}
                       >
-                        {lvl === 'All' ? 'ANY_LVL' : lvl.toUpperCase()}
+                        {lvl}
                       </button>
                     ))}
                   </div>
                 </div>
               </header>
 
-              <div className="relative group">
-                <div className="absolute inset-0 bg-primary/5 blur-2xl group-focus-within:bg-primary/10 transition-colors" />
-                <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 text-primary/40 group-focus-within:text-primary transition-colors z-10" />
+              <div className="relative group max-w-2xl">
+                <div className="absolute inset-0 bg-primary/5 blur-xl group-focus-within:bg-primary/10 transition-colors" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted group-focus-within:text-primary transition-colors z-10" />
                 <input 
                   type="text"
-                  placeholder={language === 'en' ? 'ACCESS_COLLECTION_DATA...' : 'ПОИСК_В_АРХИВЕ...'}
+                  placeholder={language === 'en' ? 'Search archive...' : 'Поиск в архиве...'}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-16 pr-6 py-8 bg-card/80 backdrop-blur-2xl border border-research-line rounded-[32px] focus:border-primary outline-none transition-all shadow-2xl text-xl font-black placeholder:text-text-muted/20 italic uppercase tracking-tighter relative z-10"
+                  className="w-full pl-12 pr-4 py-3 bg-card border border-border rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-medium placeholder:text-text-muted relative z-10"
                 />
               </div>
 
@@ -1083,9 +1058,9 @@ function AppContent() {
               exit={{ opacity: 0, x: -20 }}
               className="space-y-10 px-4 md:px-0"
             >
-              <header>
-                <h1 className="text-4xl font-black text-text-main uppercase tracking-tighter italic leading-none">{language === 'en' ? 'Operational_Rank' : 'Ваш Прогресс'}</h1>
-                <p className="text-text-muted font-mono text-[10px] uppercase tracking-widest mt-1 opacity-60">Status: {overallProgress}%_SYNC // Module: DATA_REFINEMENT_V4</p>
+              <header className="space-y-1">
+                <h1 className="text-3xl font-display font-bold text-text-main tracking-tight">{language === 'en' ? 'Your Progress' : 'Ваш Прогресс'}</h1>
+                <p className="text-text-muted text-sm font-medium">Status: {overallProgress}% Complete</p>
               </header>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -1425,12 +1400,9 @@ function AppContent() {
 
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 pt-2">
                     {[
-                      { id: 'research', name: language === 'en' ? 'Research' : 'Тёмная', icon: Moon, color: 'bg-[#12141C]' },
-                      { id: 'light', name: language === 'en' ? 'Laboratory' : 'Светлая', icon: Sun, color: 'bg-white' },
+                      { id: 'dark', name: language === 'en' ? 'Dark' : 'Тёмная', icon: Moon, color: 'bg-[#18181B]' },
+                      { id: 'light', name: language === 'en' ? 'Light' : 'Светлая', icon: Sun, color: 'bg-white' },
                       { id: 'cyberpunk', name: 'Cyberpunk', icon: Zap, color: 'bg-[#0D0221]' },
-                      { id: 'matrix', name: 'Matrix', icon: Terminal, color: 'bg-[#0D0208]' },
-                      { id: 'spectrum', name: 'Spectrum', icon: Joystick, color: 'bg-black' },
-                      { id: 'space', name: 'Space', icon: Stars, color: 'bg-[#050510]' },
                     ].map((t) => (
                       <button
                         key={t.id}
@@ -1824,11 +1796,7 @@ function AppContent() {
 
 function NavButton({ active, onClick, icon, label, theme, playSound, highlight = false, isCollapsed = false }: { active: boolean, onClick: () => void, icon: React.ReactNode, label: string, theme: string, playSound: (t: any) => void, highlight?: boolean, isCollapsed?: boolean }) {
   const getThemeIcon = (originalIcon: any) => {
-    const iconSize = "w-5 h-5 md:w-6 md:h-6";
-    if (theme === 'space') return <Stars className={iconSize} />;
-    if (theme === 'matrix') return <Terminal className={iconSize} />;
-    if (theme === 'cyberpunk') return <Zap className={iconSize} />;
-    if (theme === 'spectrum') return <Joystick className={iconSize} />;
+    const iconSize = "w-5 h-5 md:w-5 md:h-5";
     return React.isValidElement(originalIcon) ? React.cloneElement(originalIcon as React.ReactElement<any>, { className: iconSize }) : originalIcon;
   };
 
@@ -1842,60 +1810,42 @@ function NavButton({ active, onClick, icon, label, theme, playSound, highlight =
       onClick={handleClick}
       title={isCollapsed ? label : undefined}
       className={cn(
-        "flex md:flex-row flex-col items-start md:items-center gap-3 md:gap-4 px-4 md:px-5 py-3 md:py-4 rounded-2xl transition-all duration-500 w-fit md:w-full relative group overflow-hidden shrink-0",
-        isCollapsed && "md:px-0 md:justify-center",
-        active ? (theme === 'light' ? "bg-primary/10 text-primary border border-primary/40 shadow-lg" : "bg-primary/10 text-primary border border-primary/20 shadow-[0_0_30px_rgba(0,209,255,0.05)]") : 
-
-        highlight ? (theme === 'light' ? "bg-secondary text-white border border-secondary shadow-md hover:bg-secondary/90" : "bg-secondary/10 text-secondary border border-secondary/20 hover:bg-secondary/20") :
-        theme === 'light' ? "bg-transparent text-text-muted hover:bg-white hover:shadow-sm hover:text-text-main border border-transparent hover:border-research-line" :
-        "bg-transparent text-text-muted hover:bg-primary/5 hover:text-text-main"
+        "flex md:flex-row flex-col items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 w-fit md:w-full relative shrink-0",
+        isCollapsed && "md:px-0 md:justify-center py-4",
+        active ? "bg-primary/10 text-primary font-medium" : 
+        highlight ? "bg-secondary text-white shadow-md hover:bg-secondary/90" : 
+        "text-text-muted hover:bg-accent-soft hover:text-text-main"
       )}
     >
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-      <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-      
       {active && (
-        <>
-          <motion.div 
-            layoutId="nav-pill"
-            className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-10 bg-primary rounded-r-full hidden md:block shadow-[0_0_15px_#00d1ff] z-10"
-          />
-          <div className="absolute inset-0 bg-primary/10 animate-[scanline_3s_linear_infinite] opacity-10" />
-        </>
+        <motion.div 
+          layoutId="nav-pill"
+          className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary rounded-r-lg hidden md:block"
+        />
       )}
       
-      <div className={cn(
-        "transition-all duration-700",
-        active ? "text-primary scale-110 drop-shadow-[0_0_12px_rgba(0,209,255,0.6)]" : 
-        theme === 'light' ? "text-text-muted opacity-70 group-hover:opacity-100 group-hover:scale-110" :
-        "text-text-muted opacity-40 group-hover:opacity-100 group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_rgba(0,209,255,0.3)]"
-      )}>
-        {getThemeIcon(icon)}
+      <div className={cn("relative z-10", active && "animate-pulse-slow")}>
+         {getThemeIcon(icon)}
       </div>
-      <span className={cn(
-        "text-[9px] md:text-[11px] font-mono uppercase tracking-[0.2em] transition-all duration-500",
-        isCollapsed ? "md:w-0 md:opacity-0 md:overflow-hidden whitespace-nowrap" : "md:w-auto md:opacity-100",
-        active ? "font-black text-text-main italic" : 
-        theme === 'light' ? "font-bold text-text-muted/80 group-hover:text-text-main" :
-        "font-bold"
-      )}>{label}</span>
+      
+      {!isCollapsed && (
+        <span className={cn(
+          "text-sm font-medium hidden md:block z-10 transition-colors tracking-tight",
+          active ? "text-primary" : "text-text-muted transition-colors"
+        )}>
+          {label}
+        </span>
+      )}
     </button>
   );
 }
 
 function LessonCard({ lesson, completed, onClick, theme }: { lesson: Lesson, completed: boolean, onClick: () => void, theme: string }) {
   const { language } = useLanguage();
-  const [showInfo, setShowInfo] = useState(false);
   const difficultyMap: Record<string, string> = {
-    'Beginner': 'TIER_I',
-    'Intermediate': 'TIER_II',
-    'Advanced': 'TIER_III'
-  };
-
-  const difficultyDesc: Record<string, string> = {
-    'Beginner': 'Core principles. Focusing on fundamental data logic.',
-    'Intermediate': 'Technical execution. Requires algorithmic understanding.',
-    'Advanced': 'Advanced research. Professional-grade methodology.'
+    'Beginner': 'Beginner',
+    'Intermediate': 'Intermediate',
+    'Advanced': 'Advanced'
   };
 
   return (
@@ -1904,70 +1854,56 @@ function LessonCard({ lesson, completed, onClick, theme }: { lesson: Lesson, com
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      whileHover={{ y: -8, transition: { duration: 0.2 } }}
+      whileHover={{ y: -4, transition: { duration: 0.2 } }}
       onClick={onClick}
       className={cn(
-        "bg-card/90 backdrop-blur-xl border border-research-line rounded-[32px] md:rounded-[40px] p-8 md:p-10 shadow-2xl hover:shadow-primary/10 transition-all duration-500 cursor-pointer group relative overflow-hidden",
-        theme === 'light' ? "hover:border-primary/60 shadow-lg border-research-line/60" : "hover:border-primary/40"
+        "bg-card border border-border rounded-3xl p-6 md:p-8 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer group flex flex-col relative overflow-hidden",
+        theme === 'light' ? "hover:border-primary/40" : "hover:border-primary/50"
       )}
     >
-      <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-opacity">
-        <Atom className="w-20 h-20 -mr-6 -mt-6 rotate-12" />
-      </div>
-      
-      <div className="absolute top-6 left-6 flex gap-2">
-         <div className={cn("w-1.5 h-1.5 rounded-full", completed ? "bg-success shadow-[0_0_8px_#10b981]" : "bg-primary shadow-[0_0_8px_#00d1ff]")} />
-         <div className="w-1.5 h-1.5 rounded-full bg-white/5" />
+      <div className="absolute top-4 right-4 flex gap-1.5 opacity-60">
+         <div className={cn("w-1.5 h-1.5 rounded-full", completed ? "bg-success" : "bg-primary/50")} />
       </div>
 
-      <div className="relative z-10 flex flex-col gap-6">
+      <div className="relative z-10 flex flex-col gap-6 flex-1">
         <div className="flex justify-between items-start">
           <div className={cn(
-            "w-12 h-12 rounded-xl flex items-center justify-center transition-all border border-research-line",
-            completed ? "bg-success/10 text-success border-success/30" : "bg-primary/5 text-primary group-hover:bg-primary group-hover:text-text-main"
+            "w-12 h-12 rounded-2xl flex items-center justify-center transition-all bg-accent-soft text-text-main group-hover:bg-primary group-hover:text-white border border-border group-hover:border-primary/20",
+            completed && "bg-success/10 text-success border-success/20"
           )}>
-            {lesson.category === 'Analytics' ? <BarChart3 className="w-7 h-7" /> : 
-             lesson.category === 'Statistics' ? <TrendingUp className="w-7 h-7" /> : 
-             <BrainCircuit className="w-7 h-7" />}
+            {lesson.category === 'Analytics' ? <BarChart3 className="w-5 h-5" /> : 
+             lesson.category === 'Statistics' ? <TrendingUp className="w-5 h-5" /> : 
+             lesson.category === 'SQL' ? <Database className="w-5 h-5" /> :
+             <BrainCircuit className="w-5 h-5" />}
           </div>
           {completed && (
-            <div className="bg-success/20 text-success text-[8px] font-mono font-black border border-success/30 px-2 py-0.5 rounded-full">
-              VALIDATED
+            <div className="bg-success/10 text-success text-[10px] uppercase font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+              Done
             </div>
           )}
         </div>
 
-        <div className="space-y-3">
-          <div className="flex items-center gap-3">
-            <span className="text-[10px] font-mono font-black text-primary uppercase tracking-[0.3em]">{difficultyMap[lesson.difficulty]}</span>
-            <span className="text-[10px] font-mono text-text-muted/40 uppercase tracking-widest leading-none">[{lesson.category}]</span>
+        <div className="space-y-3 flex-1 flex flex-col">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-[11px] font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-md">{lesson.difficulty}</span>
+            <span className="text-[11px] font-medium text-text-muted">{lesson.category}</span>
           </div>
-          <h3 className="font-black text-2xl text-text-main leading-tight uppercase italic group-hover:text-primary transition-colors tracking-tighter">
+          <h3 className="font-display font-semibold text-xl text-text-main leading-tight group-hover:text-primary transition-colors tracking-tight break-words hyphens-auto">
             {language === 'en' ? lesson.title_en || lesson.title : lesson.title}
           </h3>
-          <p className="text-sm text-text-muted line-clamp-2 leading-relaxed font-medium italic opacity-70">
+          <p className="text-sm text-text-muted line-clamp-2 leading-relaxed">
             {language === 'en' ? lesson.description_en || lesson.description : lesson.description}
           </p>
         </div>
 
-        <div className="pt-6 border-t border-research-line flex items-center justify-between">
-           <div className="flex items-center gap-3">
-              <div className="flex -space-x-2">
-                 {[1,2,3].map(i => (
-                    <div key={i} className="w-5 h-5 rounded-full bg-research-line border-2 border-bg-app flex items-center justify-center text-[7px] font-bold text-text-muted/40">
-                       {i}
-                    </div>
-                 ))}
-              </div>
-              <span className="text-[8px] font-mono text-text-muted/40 uppercase tracking-[0.2em]">{lesson.solutionSteps?.length} NODES</span>
+        <div className="pt-5 border-t border-border flex items-center justify-between mt-auto">
+           <div className="flex items-center gap-2">
+              <span className="text-[11px] font-medium text-text-muted">{lesson.solutionSteps?.length || 0} Steps</span>
            </div>
            
            <div className="flex items-center gap-2 group/btn">
-               <span className={cn(
-                 "text-[9px] font-mono font-black text-primary uppercase tracking-widest transition-all duration-500",
-                 theme === 'light' ? "opacity-100 translate-x-0" : "opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-2"
-               )}>INITIATE</span>
-              <div className="w-8 h-8 rounded-full border border-research-line flex items-center justify-center group-hover:border-primary group-hover:bg-primary group-hover:text-black transition-all">
+              <span className="text-[11px] font-bold text-primary opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300">START</span>
+              <div className="w-8 h-8 rounded-full border border-border flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all group-hover:border-primary/20">
                  <ChevronRight className="w-4 h-4" />
               </div>
            </div>
@@ -1979,13 +1915,13 @@ function LessonCard({ lesson, completed, onClick, theme }: { lesson: Lesson, com
 
 function StatCard({ icon, label, value, theme }: { icon: React.ReactNode, label: string, value: string | number, theme: string }) {
   return (
-    <div className="bg-card border border-research-line p-6 rounded-[32px] shadow-sm hover:shadow-md transition-all flex items-center gap-5 group">
-      <div className="w-16 h-16 bg-accent-soft rounded-2xl flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
-        {React.isValidElement(icon) ? React.cloneElement(icon as React.ReactElement<any>, { className: "w-8 h-8 text-primary" }) : icon}
+    <div className="bg-card border border-border p-5 rounded-3xl shadow-sm hover:shadow-md transition-all flex items-center gap-4 group">
+      <div className="w-12 h-12 bg-accent-soft rounded-2xl flex items-center justify-center shadow-inner group-hover:shadow-primary/10 group-hover:bg-primary/5 transition-colors">
+        {React.isValidElement(icon) ? React.cloneElement(icon as React.ReactElement<any>, { className: "w-6 h-6 text-primary" }) : icon}
       </div>
       <div>
-        <p className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em]">{label}</p>
-        <p className="text-3xl font-black text-text-main mt-0.5 italic tracking-tighter">{value}</p>
+        <p className="text-xs text-text-muted font-medium">{label}</p>
+        <p className="text-xl font-bold text-text-main mt-0.5 tracking-tight">{value}</p>
       </div>
     </div>
   );
@@ -1993,23 +1929,23 @@ function StatCard({ icon, label, value, theme }: { icon: React.ReactNode, label:
 
 function Toggle({ label, description, checked, onChange, disabled = false }: { label: string, description: string, checked: boolean, onChange: (val: boolean) => void, disabled?: boolean }) {
   return (
-    <div className={cn("flex items-center justify-between gap-6 p-4 rounded-2xl hover:bg-accent-soft/30 transition-colors", disabled && "opacity-40 pointer-events-none")}>
+    <div className={cn("flex items-center justify-between gap-6 p-4 rounded-2xl hover:bg-accent-soft/50 transition-colors", disabled && "opacity-40 pointer-events-none")}>
       <div className="flex-1">
-        <p className="text-sm font-black text-text-main uppercase italic tracking-tight">{label}</p>
-        <p className="text-[10px] text-text-muted font-mono uppercase tracking-widest mt-1 opacity-60">{description}</p>
+        <p className="text-sm font-semibold text-text-main">{label}</p>
+        <p className="text-xs text-text-muted mt-1">{description}</p>
       </div>
       <button 
         onClick={() => onChange(!checked)}
         className={cn(
-          "w-14 h-7 rounded-full transition-all duration-300 relative flex items-center px-1 shadow-inner border border-research-line",
-          checked ? "bg-primary" : "bg-card"
+          "w-12 h-6 rounded-full transition-all duration-300 relative flex items-center px-1 border border-border",
+          checked ? "bg-primary" : "bg-accent-soft"
         )}
       >
         <motion.div 
-          animate={{ x: checked ? 28 : 0 }}
+          animate={{ x: checked ? 24 : 0 }}
           className={cn(
-            "w-5 h-5 rounded-full shadow-lg transition-colors",
-            checked ? "bg-white" : "bg-text-muted/40"
+            "w-4 h-4 rounded-full shadow-sm transition-colors",
+            checked ? "bg-white" : "bg-text-muted/60"
           )}
         />
       </button>

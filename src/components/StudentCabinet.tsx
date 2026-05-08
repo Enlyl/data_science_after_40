@@ -13,7 +13,7 @@ const AVATARS = [
   'https://api.dicebear.com/7.x/pixel-art/svg?seed=Oliver',
 ];
 
-type Theme = 'research' | 'light' | 'cyberpunk' | 'matrix' | 'spectrum' | 'space';
+type Theme = 'light' | 'cyberpunk' | 'dark';
 
 interface StudentCabinetProps {
   xp?: number;
@@ -30,12 +30,9 @@ export function StudentCabinet({ xp = 0, level = 1, currentTheme, onThemeChange 
   const [showSuccess, setShowSuccess] = useState(false);
 
   const THEMES: { id: Theme; name: string; icon: any; color: string }[] = [
-    { id: 'research', name: 'Research (Dark)', icon: Moon, color: 'bg-[#12141C]' },
-    { id: 'light', name: 'Laboratory (Light)', icon: Sun, color: 'bg-white' },
+    { id: 'dark', name: 'Dark Mode', icon: Moon, color: 'bg-[#18181B]' },
+    { id: 'light', name: 'Light Mode', icon: Sun, color: 'bg-white' },
     { id: 'cyberpunk', name: 'Cyberpunk', icon: Zap, color: 'bg-[#0D0221]' },
-    { id: 'matrix', name: 'Matrix', icon: Terminal, color: 'bg-[#0D0208]' },
-    { id: 'spectrum', name: 'ZX Spectrum', icon: Joystick, color: 'bg-black' },
-    { id: 'space', name: 'Infinite Space', icon: Stars, color: 'bg-[#050510]' },
   ];
 
   const handleSave = async () => {

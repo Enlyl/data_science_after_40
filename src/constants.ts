@@ -4,7 +4,7 @@ export interface Lesson {
   title_en?: string;
   description: string;
   description_en?: string;
-  category: 'Analytics' | 'Statistics' | 'Python' | 'Machine Learning';
+  category: 'Analytics' | 'Statistics' | 'Python' | 'Machine Learning' | 'SQL';
   difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
   caseStudy: string;
   caseStudy_en?: string;
@@ -199,6 +199,151 @@ print(f"Готовьте порций: {int(прогноз[0])}")`,
     fullExplanation: 'Компьютер понял, что каждый дополнительный градус жары дает вам около 7 дополнительных продаж мороженого. Это и есть чудо Машинного Обучения!',
     practicalTip: 'Линейная регрессия работает, только если связь действительно похожа на прямую линию.',
     businessValue: 'Заранее заготовленное правильное количество мороженого снизило списания испорченного товара на 40%.'
+  },
+  {
+    id: 'sql-01',
+    title: 'SQL: Разговор с Базой Данных (SELECT)',
+    title_en: 'SQL: Talking to Databases (SELECT)',
+    description: 'Основы SQL: как забрать нужные столбцы из таблицы с миллионами строк.',
+    description_en: 'SQL basics: how to retrieve specific columns from large tables.',
+    category: 'SQL',
+    difficulty: 'Beginner',
+    caseStudy: 'Анализ базы клиентов Airbnb',
+    caseStudy_en: 'Airbnb User Analytics',
+    content: 'Когда данных миллионы, хранить их в CSV-файлах невозможно. Компании используют Базы Данных (БД). А язык, на котором общаются с БД — это SQL (Structured Query Language). Самая главная команда в нем — SELECT (Выбрать). Это как сказать: "Выдай мне имя и возраст из таблицы Клиентов".',
+    content_en: 'When dealing with millions of records, CSVs don\'t cut it. Companies use Databases, and SQL is the language to query them. The core command is SELECT.',
+    problem: 'Как выгрузить список всех email-адресов пользователей из огромной таблицы `users`, чтобы отправить им рассылку?',
+    theory: 'Команда SELECT выбирает столбцы (можно переименовывать их через AS), а FROM указывает, из какой таблицы их брать. Зведочка (*) означает "все столбцы", но в Data Science это дурной тон (слишком много данных!). Оператор LIMIT ограничивает количество возвращаемых строк.',
+    visualType: 'bar',
+    data: [
+      { name: 'Пользователи (млн)', value: 45 },
+      { name: 'Выгружено (млн)', value: 45 }
+    ],
+    solutionCode: `SELECT 
+    first_name AS user_name, 
+    email AS user_email
+FROM users
+LIMIT 100;`,
+    solutionSteps: [
+      'Определить нужную таблицу (users).',
+      'Выбрать команду SELECT и задать псевдонимы (AS).',
+      'Ограничить вывод с помощью LIMIT.'
+    ],
+    fullExplanation: 'За 0.5 секунды база данных обработала 45 миллионов строк и вернула вам только 2 нужные колонки. Это мощность SQL.',
+    practicalTip: 'Никогда не делайте SELECT * на рабочих таблицах — вы можете положить (сломать) базу данных компании перегрузкой памяти.',
+    businessValue: 'Быстрая и точная выгрузка данных позволяет маркетологам запускать целевые рекламные кампании.'
+  },
+  {
+    id: 'sql-02',
+    title: 'SQL: Фильтр шума (WHERE)',
+    title_en: 'SQL: Filtering Noise (WHERE)',
+    description: 'Учимся находить бриллианты в терабайтах данных: условия, фильтры, операторы.',
+    description_en: 'Finding diamons in terabytes of data: conditions, filters, operators.',
+    category: 'SQL',
+    difficulty: 'Beginner',
+    caseStudy: 'Антифрод в Банке',
+    caseStudy_en: 'Bank Anti-fraud',
+    content: 'Достать все данные — легко. Но аналитикам нужно искать конкретные вещи: "Транзакции больше 1000$ в ночное время" или "Пользователи из РФ, которые не заходили 6 месяцев". Для этого используется оператор WHERE.',
+    content_en: 'Extracting everything is easy. Analysts need specific data. The WHERE operator is used to filter records.',
+    problem: 'Нужно найти все подозрительные переводы (сумма > 100_000 руб) за последнюю неделю.',
+    theory: 'WHERE работает как сито. Мы фильтруем данные с помощью условий и операторов: > (больше), < (меньше), = (равно). Их можно комбинировать через AND (И) или OR (ИЛИ). Также полезны BETWEEN (проверка диапазона) и LIKE (поиск по шаблону). Например: WHERE amount > 1000 AND status = "success".',
+    visualType: 'scatter',
+    data: [
+      { x: 1, y: 5000, name: 'Ок' },
+      { x: 2, y: 150000, name: 'Фрод!' },
+      { x: 3, y: 200, name: 'Ок' }
+    ],
+    solutionCode: `SELECT 
+    transaction_id, 
+    amount, 
+    user_id 
+FROM transactions
+WHERE amount BETWEEN 100000 AND 500000 
+  AND status = 'success'
+  AND merchant_name LIKE '%Crypto%';`,
+    solutionSteps: [
+      'Выбираем таблицу транзакций.',
+      'Добавляем блок WHERE.',
+      'Используем BETWEEN для диапазона и LIKE для поиска текста.'
+    ],
+    fullExplanation: 'База "отсеила" миллионы обычных покупок кофе и выдала вам список из 15 подозрительных операций для ручной проверки.',
+    practicalTip: 'Порядок важен: WHERE всегда пишется ПОСЛЕ FROM, но ДО сортировки (ORDER BY).',
+    businessValue: 'Автоматическая фильтрация экономит сотни часов работы службы безопасности.'
+  },
+  {
+    id: 'sql-03',
+    title: 'SQL: Бизнес-метрики (GROUP BY)',
+    title_en: 'SQL: Business Metrics (GROUP BY)',
+    description: 'Считаем выручку, средний чек и количество покупок с помощью аггрегации.',
+    description_en: 'Calculating revenue, average order value and counts via aggregation.',
+    category: 'SQL',
+    difficulty: 'Intermediate',
+    caseStudy: 'Аналитика маркетплейса',
+    caseStudy_en: 'Marketplace Analytics',
+    content: 'Когда CEO спрашивает "Какая у нас выручка по городам?", ему не нужны миллионы строк с чеками. Ему нужна маленькая табличка: Город - Выручка. В SQL для сжатия (аггрегации) данных используется магия GROUP BY.',
+    content_en: 'When a CEO asks for revenue by city, they don\'t want millions of rows. GROUP BY aggregates data into summaries.',
+    problem: 'Посчитать средний чек (AOV) и общую выручку для каждого города присутствия.',
+    theory: 'Функции SUM(), AVG(), COUNT() схлопывают множество строк в одну цифру. GROUP BY говорит базе данных, по какому признаку "схлопывать" продажи (например, по городу).',
+    visualType: 'bar',
+    data: [
+      { name: 'Москва', value: 500000 },
+      { name: 'Спб', value: 300000 },
+      { name: 'Казань', value: 150000 }
+    ],
+    solutionCode: `SELECT 
+    city,
+    COUNT(order_id) as total_orders,
+    SUM(amount) as total_revenue,
+    AVG(amount) as aov
+FROM orders
+GROUP BY city
+ORDER BY total_revenue DESC;`,
+    solutionSteps: [
+      'Выбираем колонку для группировки (city).',
+      'Применяем агрегатные функции к числовым колонкам.',
+      'Группируем (GROUP BY) и сортируем по убыванию выручки (ORDER BY DESC).'
+    ],
+    fullExplanation: 'Из миллиона строк мы получили 3 строки. Это уже не просто сырые данные, это Инсайт, готовый для дашборда!',
+    practicalTip: 'Всё, что вы написали в SELECT (кроме агрегатных функций с математикой), ОБЯЗАТЕЛЬНО должно быть перечислено в GROUP BY.',
+    businessValue: 'Понимание AOV по регионам позволяет грамотно распределять маркетинговый бюджет.'
+  },
+  {
+    id: 'sql-04',
+    title: 'SQL: Сшиваем Франкенштейна (JOIN)',
+    title_en: 'SQL: Stitching Frankenstein (JOIN)',
+    description: 'Как объединять данные из разных таблиц по ключам (ID).',
+    description_en: 'Merging data from multiple tables using keys (IDs).',
+    category: 'SQL',
+    difficulty: 'Advanced',
+    caseStudy: 'Рекомендательная система Netflix',
+    caseStudy_en: 'Netflix Recommender System',
+    content: 'В реальных базах данные разделены. В одной таблице лежат имена юзеров (`users`). Во второй — названия фильмов (`movies`). А в третьей — кто что посмотрел (`views`). Чтобы сделать отчет, нам нужно сшить их вместе! Это делается оператором JOIN.',
+    content_en: 'In real databases, data is split across tables. We use JOIN to merge them back together.',
+    problem: 'Получить таблицу вида "Имя человека - Какое кино он смотрел".',
+    theory: 'JOIN работает как ВПР в Excel. Он ищет совпадения по уникальным идентификаторам (ID). Например, user_id в таблице просмотров равен id в таблице пользователей.',
+    visualType: 'bar',
+    data: [
+      { name: 'Users Table', value: 100 },
+      { name: 'Views Table', value: 100 },
+      { name: 'Joined Result', value: 200 }
+    ],
+    solutionCode: `SELECT 
+    u.first_name,
+    m.title,
+    v.watch_date
+FROM views v
+JOIN users u 
+  ON v.user_id = u.id
+JOIN movies m 
+  ON v.movie_id = m.id;`,
+    solutionSteps: [
+      'Берем центральную таблицу (views).',
+      'Присоединяем users по ключу user_id.',
+      'Присоединяем movies по ключу movie_id.'
+    ],
+    fullExplanation: 'Мы собрали распределенные данные в единую, плоскую, богатую смыслами таблицу. Именно такие таблицы скармливают алгоритмам машинного обучения.',
+    practicalTip: 'Используйте алиасы (короткие псевдонимы таблиц, например u вместо users), чтобы код был чище.',
+    businessValue: 'Склеивание данных из CRM и логов приложения — первый шаг к созданию профиля 360° для клиента.'
   }
 ];
 
@@ -210,7 +355,7 @@ export interface TheoryTopic {
   description_en: string;
   content: string;
   content_en?: string;
-  category: 'Fundamentals' | 'Mathematics' | 'Statistics' | 'Machine Learning' | 'Deep Learning';
+  category: 'Fundamentals' | 'Mathematics' | 'Statistics' | 'Machine Learning' | 'Deep Learning' | 'SQL' | 'Analytics';
   level: 'Beginner' | 'Intermediate' | 'Advanced';
   tags: string[];
 }
@@ -270,5 +415,38 @@ export const THEORY_TOPICS: TheoryTopic[] = [
     level: 'Intermediate',
     tags: ['Dataviz', 'Charts'],
     content: 'Графики нужны не для красоты, а для быстрого донесения мысли. Линейный график (Line Chart) — для показа тренда во времени (продажи за год). Столбчатая диаграмма (Bar Chart) — для сравнения категорий (какой филиал продал больше). Диаграмма рассеяния (Scatter Plot) — чтобы показать связь двух вещей (зависит ли зарплата от возраста).'
+  },
+  {
+    id: 'th-sql-01',
+    title: 'Реляционные Базы Данных',
+    title_en: 'Relational Databases',
+    description: 'Почему данные хранят в разных связанных таблицах, а не в одной мега-таблице.',
+    description_en: 'Why data is stored in multiple linked tables instead of one huge table.',
+    category: 'SQL',
+    level: 'Beginner',
+    tags: ['Database', 'SQL', 'Architecture'],
+    content: 'Представьте файл Excel, в котором записаны имена клиентов, адреса, истории заказов и названия товаров. Если клиент сменит адрес, придется менять его в тысяче строк его заказов! В реляционных БД данные разделены (нормализованы): отдельно таблица клиентов, отдельно таблица товаров, отдельно таблица заказов. А связываются они через уникальные номера (ID). Это спасает от хаоса, дублирования и ошибок.'
+  },
+  {
+    id: 'th-sql-02',
+    title: 'Анатомия SQL-запроса',
+    title_en: 'Anatomy of an SQL Query',
+    description: 'Порядок написания и порядок выполнения SQL-команд: SELECT, FROM, WHERE...',
+    description_en: 'Order of writing and execution of SQL commands.',
+    category: 'SQL',
+    level: 'Beginner',
+    tags: ['SQL', 'Syntax'],
+    content: 'В SQL мы пишем команды в одном порядке, но компьютер читает их в другом. Мы пишем: 1) SELECT (что взять), 2) FROM (откуда), 3) WHERE (какой фильтр). А компьютер исполняет: Сначала идет в таблицу (FROM), затем отсеивает лишнее (WHERE), и только потом берет нужные колонки (SELECT). Понимание этого логического порядка поможет избежать 90% ошибок для новичков.'
+  },
+  {
+    id: 'th-sql-03',
+    title: 'Типы JOIN: LEFT, INNER, RIGHT',
+    title_en: 'JOIN Types: LEFT, INNER, RIGHT',
+    description: 'Разница между видами склейки таблиц. Как не потерять важные данные.',
+    description_en: 'Difference between JOIN types. How to avoid losing data.',
+    category: 'SQL',
+    level: 'Intermediate',
+    tags: ['SQL', 'JOIN', 'Data Prep'],
+    content: 'INNER JOIN возвращает только те строки, которые есть в ОБЕИХ таблицах (например, пользователи, которые совершили хотя бы одну покупку). LEFT JOIN более популярен в Data Science — он берет ВСЕ строки из "левой" (основной) таблицы и приклеивает данные из правой. Если совпадений нет, он ставит NULL. Это критически важно, когда мы хотим посмотреть на всех пользователей, а не только на активных покупателей.'
   }
 ];

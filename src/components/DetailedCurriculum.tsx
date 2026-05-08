@@ -12,7 +12,8 @@ import {
   Cpu,
   BrainCircuit,
   Settings2,
-  Lightbulb
+  Lightbulb,
+  Database
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useLanguage } from '../lib/i18n';
@@ -64,7 +65,34 @@ export function DetailedCurriculum() {
     },
     {
       id: 2,
-      title: language === 'ru' ? "Фаза 2: Изучение Языка" : "Phase 2: Learning the Language",
+      title: language === 'ru' ? "Фаза 2: Извлечение Информации" : "Phase 2: Data Extraction",
+      subtitle: language === 'ru' ? "SQL для общения с БД" : "SQL for DB Communication",
+      duration: language === 'ru' ? "4 Недели" : "4 Weeks",
+      intensity: language === 'ru' ? "6-8 часов в неделю" : "6-8 hours per week",
+      description: language === 'ru' 
+        ? "Компании не хранят данные в эксельках, они используют Базы Данных. SQL — это язык общения с этими базами, чтобы за долю секунды выгрузить нужное из миллионов строк."
+        : "Companies don't store data in spreadsheets, they use Databases. SQL is the language to query them, retrieving exactly what you need from millions of rows in milliseconds.",
+      whatToLearn: language === 'ru' ? [
+        "Основы SELECT и WHERE (Умная выгрузка)",
+        "Аггрегация GROUP BY (Сжатие данных для CEO)",
+        "Сшивание таблиц JOIN (Сборка единого пазла)",
+        "Оконные функции (Взрослая аналитика)"
+      ] : [
+        "SELECT and WHERE basics (Smart extraction)",
+        "GROUP BY aggregations (Summaries for the CEO)",
+        "JOINing tables (Stitching the puzzle)",
+        "Window Functions (Advanced analytics)"
+      ],
+      howToLearn: language === 'ru'
+        ? "Пишите реальные запросы в песочнице. Поймите логику SQL (Сначала FROM, потом WHERE, в конце SELECT)."
+        : "Write real queries in the sandbox. Understand the execution logic (FROM first, then WHERE, and finally SELECT).",
+      focus: language === 'ru' ? "Сбор и очистка нужных данных из сырых таблиц." : "Gathering and cleaning the right data from raw tables.",
+      icon: Database,
+      color: "#f59e0b"
+    },
+    {
+      id: 3,
+      title: language === 'ru' ? "Фаза 3: Изучение Языка" : "Phase 3: Learning the Language",
       subtitle: language === 'ru' ? "Прикладной Python для данных" : "Applied Python for Data",
       duration: language === 'ru' ? "8 Недель" : "8 Weeks",
       intensity: language === 'ru' ? "8-10 часов в неделю" : "8-10 hours per week",
@@ -90,8 +118,8 @@ export function DetailedCurriculum() {
       color: "#8b5cf6"
     },
     {
-      id: 3,
-      title: language === 'ru' ? "Фаза 3: Искусство Прозрения" : "Phase 3: The Art of Insight",
+      id: 4,
+      title: language === 'ru' ? "Фаза 4: Искусство Прозрения" : "Phase 4: The Art of Insight",
       subtitle: language === 'ru' ? "Визуализация и Сторителлинг" : "Visualization & Storytelling",
       duration: language === 'ru' ? "4 Недели" : "4 Weeks",
       intensity: language === 'ru' ? "5-7 часов в неделю" : "5-7 hours per week",
@@ -117,8 +145,8 @@ export function DetailedCurriculum() {
       color: "#ec4899"
     },
     {
-      id: 4,
-      title: language === 'ru' ? "Фаза 4: Сила Прогноза" : "Phase 4: Predictive Power",
+      id: 5,
+      title: language === 'ru' ? "Фаза 5: Сила Прогноза" : "Phase 5: Predictive Power",
       subtitle: language === 'ru' ? "Прикладное машинное обучение" : "Applied Machine Learning",
       duration: language === 'ru' ? "12 Недель" : "12 Weeks",
       intensity: language === 'ru' ? "10-12 часов в неделю" : "10-12 hours per week",
